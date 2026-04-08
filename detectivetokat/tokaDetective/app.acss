@@ -1,3 +1,4 @@
+/* Sub-project styles */
 page {
-  background: #f7f7f7;
+  /* Inherits dark theme from root app.acss */
 }

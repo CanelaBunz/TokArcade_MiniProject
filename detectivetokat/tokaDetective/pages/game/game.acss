@@ -13,22 +13,6 @@
   opacity: 0.14;
 }
 
-.glow-1 {
-  width: 260rpx;
-  height: 260rpx;
-  background: #8b5cf6;
-  top: 120rpx;
-  left: -60rpx;
-}
-
-.glow-2 {
-  width: 220rpx;
-  height: 220rpx;
-  background: #4c1d95;
-  right: -30rpx;
-  bottom: 240rpx;
-}
-
 .hud {
   display: flex;
   justify-content: space-between;
@@ -37,29 +21,9 @@
   z-index: 2;
 }
 
-.score,
-.timer,
-.counter,
-.lives,
-.category-badge,
-.mode-badge {
-  font-family: monospace;
-}
-
-.score {
-  font-size: 28rpx;
-  color: #c4b5fd;
-}
-
-.timer {
-  font-size: 28rpx;
-  color: #9ca3af;
-}
-
-.counter {
-  font-size: 26rpx;
-  color: #9ca3af;
-}
+.score { font-size: 28rpx; color: #c4b5fd; }
+.timer { font-size: 28rpx; color: #9ca3af; }
+.counter { font-size: 26rpx; color: #9ca3af; }
 
 .lives {
   margin-top: 14rpx;
@@ -94,8 +58,7 @@
   z-index: 2;
 }
 
-.walk-phase,
-.result-phase {
+.walk-phase, .result-phase {
   min-height: 780rpx;
   display: flex;
   flex-direction: column;
@@ -103,10 +66,7 @@
   align-items: center;
 }
 
-.walk-icon {
-  font-size: 88rpx;
-}
-
+.walk-icon { font-size: 88rpx; }
 .walk-title {
   margin-top: 24rpx;
   font-size: 34rpx;
@@ -115,13 +75,7 @@
   font-weight: bold;
 }
 
-.walk-subtitle {
-  margin-top: 14rpx;
-  font-size: 26rpx;
-  color: #6b7280;
-  text-align: center;
-}
-
+/* Question Phase - Scratchable Mystery Box */
 .question-phase {
   min-height: 780rpx;
   display: flex;
@@ -135,90 +89,130 @@
   margin-top: 8rpx;
 }
 
-.paper-icon {
-  font-size: 72rpx;
-}
-
+.paper-icon { font-size: 72rpx; }
 .paper-hint {
   margin-top: 10rpx;
   font-size: 22rpx;
   color: #6b7280;
 }
 
-.pulse {
-  animation: pulsePaper 1.1s infinite;
-}
-
-@keyframes pulsePaper {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.08); opacity: 0.55; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-.question-wrap {
+.scratch-box {
   margin-top: 36rpx;
-  border-radius: 20rpx;
-  padding: 28rpx 22rpx;
+  position: relative;
+  width: 100%;
+  min-height: 400rpx;
+  border-radius: 24rpx;
+  overflow: hidden;
+  background: #111;
+  border: 6rpx solid #3e2723;
+  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.8);
+}
+
+.question-layer {
+  position: absolute;
+  inset: 0;
+  background: #fdf6e3;
+  padding: 40rpx 30rpx;
   box-sizing: border-box;
-  min-height: 220rpx;
-  border: 3rpx dashed rgba(245, 158, 11, 0.35);
-}
-
-.question-wrap.hidden {
-  background: rgba(0, 0, 0, 0.45);
-  opacity: 0.22;
-}
-
-.question-wrap.revealed {
-  background: rgba(254, 243, 199, 0.95);
-  opacity: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .question-title {
-  font-size: 24rpx;
-  color: #5b21b6;
+  font-size: 26rpx;
+  color: #7c3aed;
   font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2rpx;
+  margin-bottom: 24rpx;
+  text-align: center;
 }
 
 .question-text {
-  margin-top: 18rpx;
-  font-size: 30rpx;
-  line-height: 1.55;
-  color: #111827;
+  font-size: 34rpx;
+  line-height: 1.6;
+  color: #111;
   font-weight: bold;
+  text-align: center;
+}
+
+.darkness-layer {
+  position: absolute;
+  inset: 0;
+  background: #0d0b1a; /* Very dark blue-black */
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none; /* Touches pass through to #scratchContainer */
+
+  /* The magic bit: cutout hole */
+  /* We use radial-gradient as mask. Transparent in the middle, black elsewhere */
+  /* Since it's CSS, we'll try standard mask-image */
+}
+
+.darkness-pattern {
+  font-size: 160rpx;
+  color: rgba(124, 58, 237, 0.1);
+  font-weight: bold;
+}
+
+.floating-torch {
+  position: absolute;
+  width: 100rpx;
+  height: 100rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 72rpx;
+  z-index: 10;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 0 15rpx rgba(255, 255, 255, 0.4));
+}
+
+.torch-glow {
+  position: absolute;
+  width: 150rpx;
+  height: 150rpx;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(0, -30rpx); /* Slightly offset upward to match beam direction */
 }
 
 .tools {
   margin-top: auto;
   display: flex;
+  flex-direction: column;
   gap: 18rpx;
 }
 
-.tool {
-  flex: 1;
+.tool-instruction {
+  font-size: 26rpx;
+  color: #94a3b8;
+  text-align: center;
+  padding: 10rpx 0;
+  font-style: italic;
+}
+
+.tool.lens {
   height: 96rpx;
   border-radius: 20rpx;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: bold;
-}
-
-.tool.torch {
-  background: #f59e0b;
-  color: #ffffff;
-}
-
-.tool.lens {
   background: #1e1b2f;
   color: #c4b5fd;
   border: 3rpx solid #7c3aed;
 }
 
 .tool.active {
-  transform: scale(1.02);
-  box-shadow: 0 0 0 4rpx rgba(196, 181, 253, 0.15);
+  background: rgba(124, 58, 237, 0.2);
+  box-shadow: 0 0 20rpx rgba(124, 58, 237, 0.5);
 }
 
 .feedback {
@@ -236,49 +230,49 @@
   align-items: center;
   padding: 24rpx;
   box-sizing: border-box;
-  z-index: 20;
+  z-index: 100;
 }
 
 .overlay-card {
   width: 100%;
-  background: #f4e9d8;
-  border: 4rpx solid #3e2723;
+  background: #1a1730;
+  border: 4rpx solid #7c3aed;
   border-radius: 24rpx;
-  padding: 28rpx 22rpx;
+  padding: 30rpx 24rpx;
   box-sizing: border-box;
 }
 
-.tutorial-card {
-  background: #1a1730;
-  border: 4rpx solid #7c3aed;
-}
-
 .overlay-title {
-  text-align: center;
-  font-size: 34rpx;
+  font-size: 38rpx;
+  color: #e2e8f0;
   font-weight: bold;
-  color: #3e2723;
+  text-align: center;
+  margin-bottom: 24rpx;
 }
 
-.tutorial-card .overlay-title {
+.tutorial-step {
+  font-size: 28rpx;
   color: #c4b5fd;
+  margin-top: 16rpx;
+  text-align: center;
+  line-height: 1.5;
 }
 
 .opt {
-  margin-top: 18rpx;
-  background: #ffffff;
-  border: 3rpx solid #3e2723;
+  background: #2d2550;
+  border: 3rpx solid rgba(124, 58, 237, 0.45);
   border-radius: 16rpx;
-  padding: 22rpx 18rpx;
-  font-size: 28rpx;
-  color: #000000;
+  padding: 20rpx;
+  margin-top: 16rpx;
+  font-size: 30rpx;
+  color: #e2e8f0;
   text-align: center;
-  font-weight: bold;
 }
 
 .opt.selected {
-  background: #c4b5fd;
-  border-color: #5b21b6;
+  background: #7c3aed;
+  border-color: #a78bfa;
+  font-weight: bold;
 }
 
 .confirm-btn {
@@ -295,18 +289,6 @@
   align-items: center;
 }
 
-.confirm-btn.disabled {
-  opacity: 0.45;
-}
-
-.tutorial-step {
-  margin-top: 18rpx;
-  font-size: 26rpx;
-  line-height: 1.55;
-  color: #9ca3af;
-}
-
-/* Pause Button Styles */
 .pause-btn {
   font-size: 32rpx;
   color: #ffffff;
@@ -314,25 +296,4 @@
   background: rgba(124, 58, 237, 0.3);
   border: 2rpx solid #7c3aed;
   border-radius: 12rpx;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.pause-btn:active {
-  transform: scale(0.9);
-  background: rgba(124, 58, 117, 0.5);
-}
-
-/* Pause Overlay Styles */
-.pause-overlay .overlay-title {
-  margin-bottom: 20rpx;
-  font-size: 44rpx;
-  color: #3e2723;
-  text-transform: uppercase;
-  letter-spacing: 2rpx;
-}
-
-.exit-btn {
-  background: #ef4444 !important;
-  margin-top: 20rpx !important;
 }

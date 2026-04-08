@@ -1,7 +1,4 @@
 <view class="page">
-  <view class="bg-glow glow-1"></view>
-  <view class="bg-glow glow-2"></view>
-
   <view class="hud">
     <view class="score">🎯 {{score}}</view>
     <view class="timer" style="color: {{timerColor}};">⏱ {{timerSeconds}}s</view>
@@ -12,93 +9,82 @@
   <view a:if="{{showLives}}" class="lives">{{livesText}}</view>
 
   <view class="category-badge">{{categoryLabel}}</view>
-  <view class="mode-badge">{{modeLabel}}</view>
 
   <view class="scene-card">
+    <!-- Walking Phase -->
     <view a:if="{{phase === 'walk'}}" class="walk-phase">
       <view class="walk-icon">🚶</view>
       <view class="walk-title">Tokat avanza por el corredor...</view>
-      <view class="walk-subtitle">Buscando la siguiente pista</view>
     </view>
 
+    <!-- Question Phase -->
     <view a:if="{{phase === 'question'}}" class="question-phase">
+      
       <view class="paper-area">
         <view class="paper-icon {{paperPulse ? 'pulse' : ''}}" onTap="tapPaper">📄</view>
         <view class="paper-hint">Inspecciona la nota</view>
       </view>
 
-      <view class="question-wrap {{questionVisible ? 'revealed' : 'hidden'}}">
-        <view class="question-title">Pregunta secreta</view>
-        <view class="question-text">{{questionText}}</view>
+      <!-- The Scratchable Box -->
+      <view class="scratch-box" id="scratchContainer"
+            catchTouchStart="onTorchStart" 
+            catchTouchMove="onTorchMove" 
+            catchTouchEnd="onTorchEnd">
+        
+        <!-- Bottom Layer: Revealed Question -->
+        <view class="question-layer">
+          <view class="question-title">Mensaje de la Sombra</view>
+          <view class="question-text">{{questionText}}</view>
+        </view>
+
+        <!-- Top Layer: Darkness with Hole-Punch Mask -->
+        <!-- Using mask-image for robust hole-punching -->
+        <view class="darkness-layer" 
+              style="mask-image: conic-gradient(from 330deg at {{torchX}}px {{torchY}}px, transparent 0deg 60deg, black 60deg); 
+                     -webkit-mask-image: conic-gradient(from 330deg at {{torchX}}px {{torchY}}px, transparent 0deg 60deg, black 60deg);">
+          <view class="darkness-pattern">?</view>
+        </view>
+
+        <!-- Floating Flashlight Visual -->
+        <view class="floating-torch" 
+              style="left: {{torchX}}px; top: {{torchY}}px; opacity: {{torchActive ? 1 : 0.7}};">
+          🔦
+          <view class="torch-glow"></view>
+        </view>
       </view>
 
       <view class="tools">
-        <view class="tool torch {{questionVisible ? 'active' : ''}}" onTouchStart="holdTorchStart" onTouchEnd="holdTorchEnd" onTouchCancel="holdTorchEnd">
-          🔦 Linterna
-        </view>
-
-        <view class="tool lens {{lensActive ? 'active' : ''}}" onTap="toggleLens">
-          🔍 Lupa
-        </view>
+        <view class="tool-instruction">"Raspa" el misterio con la linterna 🔦</view>
+        <view class="tool lens {{lensActive ? 'active' : ''}}" onTap="toggleLens">🔍 Lupa</view>
       </view>
     </view>
 
+    <!-- Result Phase -->
     <view a:if="{{phase === 'result'}}" class="result-phase">
       <view class="feedback" style="color: {{feedbackColor}};">{{feedbackText}}</view>
     </view>
   </view>
 
+  <!-- Options Overlay -->
   <view a:if="{{showOptionsOverlay}}" class="overlay">
     <view class="overlay-card">
       <view class="overlay-title">🔍 Elige una respuesta</view>
-
-      <view
-        class="opt {{selectedOption === 0 ? 'selected' : ''}}"
-        data-index="0"
-        onTap="selectOption"
-      >
-        {{currentOptions[0]}}
+      <view a:for="{{currentOptions}}" a:for-index="idx"
+            class="opt {{selectedOption === idx ? 'selected' : ''}}"
+            data-index="{{idx}}"
+            onTap="selectOption">
+        {{item}}
       </view>
-
-      <view
-        class="opt {{selectedOption === 1 ? 'selected' : ''}}"
-        data-index="1"
-        onTap="selectOption"
-      >
-        {{currentOptions[1]}}
-      </view>
-
-      <view
-        class="opt {{selectedOption === 2 ? 'selected' : ''}}"
-        data-index="2"
-        onTap="selectOption"
-      >
-        {{currentOptions[2]}}
-      </view>
-
-      <view
-        class="opt {{selectedOption === 3 ? 'selected' : ''}}"
-        data-index="3"
-        onTap="selectOption"
-      >
-        {{currentOptions[3]}}
-      </view>
-
-      <view class="confirm-btn {{selectedOption === -1 ? 'disabled' : ''}}" onTap="confirmAnswer">
-        Confirmar
-      </view>
+      <view class="confirm-btn {{selectedOption === -1 ? 'disabled' : ''}}" onTap="confirmAnswer">Confirmar</view>
     </view>
   </view>
 
+  <!-- Tutorial -->
   <view a:if="{{showTutorial}}" class="overlay">
     <view class="overlay-card tutorial-card">
-      <view class="overlay-title">¿Cómo jugar?</view>
-
-      <view class="tutorial-step">🔦 Mantén presionada la linterna para revelar la pregunta.</view>
-      <view class="tutorial-step">🔍 Activa la lupa y toca el papel 📄 para ver las respuestas.</view>
-      <view class="tutorial-step">✅ Selecciona una opción y pulsa Confirmar.</view>
-      <view class="tutorial-step">⏱ Tienes 30 segundos por pregunta.</view>
-
+      <view class="overlay-title">¿Cómo investigar?</view>
+      <view class="tutorial-step">🔦 Arrastra la linterna para "raspar" el cuadro oscuro.</view>
+      <view class="tutorial-step">🔍 Activa la lupa y toca el papel 📄 para revelar respuestas.</view>
       <view class="confirm-btn" onTap="closeTutorial">¡Entendido!</view>
     </view>
   </view>
@@ -106,7 +92,7 @@
   <!-- Pause Overlay -->
   <view a:if="{{isPaused}}" class="overlay pause-overlay">
     <view class="overlay-card">
-      <view class="overlay-title">Juego Pausado</view>
+      <view class="overlay-title">Pausado</view>
       <view class="confirm-btn" onTap="resumeGame">Continuar</view>
       <view class="confirm-btn exit-btn" onTap="exitGame">Salir</view>
     </view>

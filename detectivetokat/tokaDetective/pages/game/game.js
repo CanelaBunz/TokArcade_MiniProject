@@ -103,7 +103,10 @@ Page({
     currentOptions: ['', '', '', ''],
     currentCorrectIndex: 0,
 
-    questionVisible: false,
+    torchX: 130,
+    torchY: 80,
+    torchActive: false,
+
     lensActive: false,
     showOptionsOverlay: false,
     selectedOption: -1,
@@ -146,6 +149,7 @@ Page({
     this.timerInterval = null;
     this.timerTimeout = null;
     this.resultDelay = null;
+    this.rect = null; // Store measurement
   },
 
   onUnload() {
@@ -188,7 +192,7 @@ Page({
     this.clearQuestionTimers();
     this.setData({
       phase: 'walk',
-      questionVisible: false,
+      torchActive: false,
       lensActive: false,
       showOptionsOverlay: false,
       selectedOption: -1,
@@ -215,7 +219,9 @@ Page({
       questionText: q.q,
       currentOptions: q.opts,
       currentCorrectIndex: q.correct,
-      questionVisible: false,
+      torchX: 130,
+      torchY: 80,
+      torchActive: false,
       lensActive: false,
       showOptionsOverlay: false,
       selectedOption: -1,
@@ -225,8 +231,27 @@ Page({
       counterText: this.getCounterText(this.data.currentIndex, this.data.totalQuestions)
     });
 
+    // Capture the container size/pos to fix coordinate mapping
+    this.measureContainer();
+
     this.remainingMs = TIMER_SECONDS * 1000;
     this.startQuestionTimer();
+  },
+
+  measureContainer() {
+    my.createSelectorQuery()
+      .select('#scratchContainer')
+      .boundingClientRect()
+      .exec((res) => {
+        if (res && res[0]) {
+          this.rect = res[0];
+          // Default torch to center
+          this.setData({
+            torchX: this.rect.width / 2,
+            torchY: this.rect.height / 2
+          });
+        }
+      });
   },
 
   startQuestionTimer() {
@@ -301,24 +326,34 @@ Page({
     }
   },
 
-  holdTorchStart() {
-    if (this.data.phase !== 'question') return;
+  onTorchStart(e) {
+    if (this.data.phase !== 'question' || this.data.isPaused) return;
+    this.setData({ torchActive: true });
+    this.onTorchMove(e);
+  },
+
+  onTorchMove(e) {
+    if (this.data.phase !== 'question' || this.data.isPaused) return;
+    if (!e.touches || !e.touches[0] || !this.rect) return;
+
+    const touch = e.touches[0];
+    
+    // Calculate ELEMENT-RELATIVE coordinates
+    const x = touch.clientX - this.rect.left;
+    const y = touch.clientY - this.rect.top;
 
     this.setData({
-      questionVisible: true
+      torchX: x,
+      torchY: y
     });
   },
 
-  holdTorchEnd() {
-    if (this.data.phase !== 'question') return;
-
-    this.setData({
-      questionVisible: false
-    });
+  onTorchEnd() {
+    this.setData({ torchActive: false });
   },
 
   toggleLens() {
-    if (this.data.phase !== 'question') return;
+    if (this.data.phase !== 'question' || this.data.isPaused) return;
 
     this.setData({
       lensActive: !this.data.lensActive
@@ -326,7 +361,7 @@ Page({
   },
 
   tapPaper() {
-    if (this.data.phase !== 'question') return;
+    if (this.data.phase !== 'question' || this.data.isPaused) return;
     if (!this.data.lensActive) return;
 
     this.setData({
