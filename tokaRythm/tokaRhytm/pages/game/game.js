@@ -326,7 +326,7 @@ Page({
 
     setTimeout(() => {
       my.redirectTo({
-        url: `/pages/end/end?round=${this.data.round}&tokens=${this.data.tokensEarned}&sequenceLen=${this.data.sequence.length}`
+        url: `/tokaRythm/tokaRhytm/pages/end/end?round=${this.data.round}&tokens=${this.data.tokensEarned}&sequenceLen=${this.data.sequence.length}`
       });
     }, 700);
   },

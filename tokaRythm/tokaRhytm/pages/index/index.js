@@ -1,7 +1,7 @@
 Page({
   startGame() {
     my.redirectTo({
-      url: '/pages/game/game'
+      url: '/tokaRythm/tokaRhytm/pages/game/game'
     });
   }
 });

@@ -15,13 +15,13 @@ Page({
 
   retryGame() {
     my.redirectTo({
-      url: '/pages/game/game'
+      url: '/tokaRythm/tokaRhytm/pages/game/game'
     });
   },
 
   goMenu() {
-    my.redirectTo({
-      url: '/pages/index/index'
+    my.switchTab({
+      url: '/pages/menu/menu'
     });
   }
 });

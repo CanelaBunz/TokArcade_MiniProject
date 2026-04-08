@@ -4,7 +4,13 @@
     "pages/tienda/tienda",
     "pages/perfil/perfil",
     "pages/prejuego/prejuego",
-    "pages/juego/juego"
+    "pages/juego/juego",
+    "tokaRythm/tokaRhytm/pages/index/index",
+    "tokaRythm/tokaRhytm/pages/game/game",
+    "tokaRythm/tokaRhytm/pages/end/end",
+    "detectivetokat/tokaDetective/pages/index/index",
+    "detectivetokat/tokaDetective/pages/game/game",
+    "detectivetokat/tokaDetective/pages/end/end"
   ],
   "window": {
     "defaultTitle": "TokArcade",
