@@ -1,0 +1,63 @@
+/* Juego — Pantalla de juego real */
+
+.game-page {
+  background-color: #2b2b2b; /* Color de fondo específico de la escena Juego */
+}
+
+.exit-container {
+  padding: 40rpx;
+}
+
+.btn-exit {
+  width: 160rpx;
+  height: 80rpx;
+  background-color: #800000;
+  border: 4rpx solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-exit-text {
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+.game-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20rpx;
+}
+
+.game-title {
+  color: #ffffff;
+  font-size: 48rpx;
+  font-family: Courier, monospace;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 120rpx;
+}
+
+.game-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.game-message {
+  color: #43a047;
+  font-size: 56rpx;
+  font-family: Courier, monospace;
+  font-weight: bold;
+  margin-bottom: 60rpx;
+  white-space: pre-line;
+}
+
+.game-subtext {
+  color: #888888;
+  font-size: 28rpx;
+  font-family: Courier, monospace;
+}

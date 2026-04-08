@@ -1,0 +1,16 @@
+<view class="tab-bar">
+  <view class="tab-bar-border"></view>
+  <view 
+    a:for="{{list}}" 
+    a:key="index" 
+    class="tab-bar-item {{index === 1 ? 'center-item' : ''}}" 
+    data-path="{{item.pagePath}}" 
+    data-index="{{index}}" 
+    onTap="switchTab"
+  >
+    <view class="icon-container {{index === 1 ? 'center-circle' : ''}}" style="background-color: {{index === 1 && selected === index ? '#ff9800' : (index === 1 ? '#e68a00' : 'transparent')}}">
+      <image class="tab-icon {{index === 1 ? 'large-icon' : ''}}" src="{{selected === index ? item.selectedIconPath : item.iconPath}}" />
+    </view>
+    <view class="tab-text" style="color: {{selected === index ? selectedColor : color}}">{{item.text}}</view>
+  </view>
+</view>

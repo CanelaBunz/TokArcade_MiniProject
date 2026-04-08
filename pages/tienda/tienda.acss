@@ -1,0 +1,108 @@
+/* Tienda — Rack de premios */
+/* Equivale al diseño de estantería del Phaser con techo rayado, estantes y premios */
+
+.rack-container {
+  width: 100%;
+  padding: 60rpx 36rpx 40rpx;
+}
+
+/* --- Techo de rayas --- */
+.techo {
+  display: flex;
+  height: 120rpx;
+  border: 4rpx solid #000000;
+  overflow: hidden;
+  border-radius: 12rpx 12rpx 0 0;
+}
+
+.raya {
+  flex: 1;
+  height: 100%;
+}
+
+/* --- Estantes --- */
+.estantes {
+  background-color: #16213e;
+  border: 6rpx solid #000000;
+  border-top: none;
+}
+
+.fila-premios {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 50rpx 30rpx;
+}
+
+.premio-circle {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: 4rpx solid #000000;
+}
+
+.estante-divisor {
+  height: 6rpx;
+  background-color: #000000;
+}
+
+/* --- Letrero Premios --- */
+.letrero-premios {
+  margin-top: 30rpx;
+}
+
+.letrero-bg {
+  background-color: #6d4c41;
+  border: 4rpx solid #000000;
+  border-radius: 10rpx;
+  padding: 24rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.letrero-texto-bg {
+  background-color: #ffffff;
+  border: 2rpx solid #000000;
+  border-radius: 6rpx;
+  padding: 8rpx 80rpx;
+}
+
+.letrero-texto {
+  color: #000000;
+  font-size: 28rpx;
+  font-family: Courier, monospace;
+  font-weight: bold;
+}
+
+/* --- Barra de Puntos --- */
+.barra-puntos {
+  margin-top: 30rpx;
+}
+
+.barra-puntos-outer {
+  background-color: #000000;
+  border: 4rpx solid #000000;
+  border-radius: 10rpx;
+  padding: 10rpx;
+  display: flex;
+  justify-content: center;
+}
+
+.barra-puntos-inner {
+  background-color: #ffffff;
+  border: 2rpx solid #000000;
+  border-radius: 8rpx;
+  padding: 16rpx 40rpx;
+  width: 85%;
+  display: flex;
+  justify-content: center;
+}
+
+.puntos-valor {
+  color: #000000;
+  font-size: 30rpx;
+  font-family: Courier, monospace;
+  font-weight: bold;
+}

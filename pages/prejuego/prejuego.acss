@@ -1,0 +1,110 @@
+/* PreJuego — Instrucciones */
+
+.content-area {
+  padding: 40rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.back-button-container {
+  margin-bottom: 40rpx;
+}
+
+.btn-back {
+  width: 100rpx;
+  height: 100rpx;
+  background-color: #800000;
+  border: 4rpx solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-back-text {
+  color: #ffffff;
+  font-size: 40rpx;
+  font-weight: bold;
+}
+
+.titulo-container {
+  text-align: center;
+  margin-bottom: 60rpx;
+}
+
+.juego-titulo {
+  color: #ffffff;
+  font-size: 48rpx;
+  font-family: Courier, monospace;
+  font-weight: bold;
+}
+
+.instrucciones-section {
+  text-align: center;
+  margin-bottom: 80rpx;
+}
+
+.instrucciones-label {
+  color: #888888;
+  font-size: 32rpx;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.instrucciones-text {
+  color: #ffffff;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+.acciones-container {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30rpx;
+  padding-bottom: 60rpx;
+}
+
+.btn-jugar {
+  width: 440rpx;
+  height: 120rpx;
+  background-color: #43a047;
+  border: 4rpx solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 0 #2e7d32;
+}
+
+.btn-jugar:active {
+  transform: translateY(4rpx);
+  box-shadow: 0 4rpx 0 #2e7d32;
+}
+
+.btn-jugar-text {
+  color: #ffffff;
+  font-size: 40rpx;
+  font-weight: bold;
+}
+
+.btn-leaderboard {
+  width: 400rpx;
+  height: 90rpx;
+  background-color: #3949ab;
+  border: 4rpx solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8rpx;
+}
+
+.btn-leaderboard:active {
+  opacity: 0.8;
+}
+
+.btn-leaderboard-text {
+  color: #ffffff;
+  font-size: 30rpx;
+  font-weight: bold;
+}

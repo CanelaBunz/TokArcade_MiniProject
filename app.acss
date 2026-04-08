@@ -1,0 +1,90 @@
+/* ============================================
+   TokArcade — Estilos Globales
+   Paleta original del frontend Phaser
+   ============================================ */
+
+/* --- Reset & Base --- */
+page {
+  background-color: #1a1a2e;
+  color: #ffffff;
+  font-family: Courier, monospace;
+  font-size: 28rpx;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- Contenedor de página reutilizable --- */
+.page-container {
+  min-height: 100vh;
+  background-color: #1a1a2e;
+}
+
+/* --- Utilidades de texto --- */
+.text-accent {
+  color: #e94560;
+}
+
+.text-muted {
+  color: #888888;
+}
+
+.text-light {
+  color: #aaaaaa;
+}
+
+.text-white {
+  color: #ffffff;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-bold {
+  font-weight: bold;
+}
+
+/* --- Utilidades de layout --- */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Bordes estilo wireframe --- */
+.border-white {
+  border: 4rpx solid #ffffff;
+}
+
+.border-secondary {
+  border: 4rpx solid #0f3460;
+}
+
+/* --- Fondos --- */
+.bg-primary {
+  background-color: #1a1a2e;
+}
+
+.bg-secondary {
+  background-color: #0f3460;
+}
+
+.bg-dark {
+  background-color: #16213e;
+}
+
+.bg-accent {
+  background-color: #e94560;
+}

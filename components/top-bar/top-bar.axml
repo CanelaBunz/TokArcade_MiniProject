@@ -1,0 +1,11 @@
+<!-- TopBar: Barra superior con campana y puntos -->
+<!-- Equivalente a componentes/TopBar.js del frontend Phaser -->
+<view class="top-bar">
+  <view class="top-bar-content">
+    <view class="bell-icon" onTap="onBellTap">🔔</view>
+    <view class="puntos-box">
+      <text class="puntos-text">{{puntos}} PUNTOS</text>
+    </view>
+  </view>
+  <view class="top-bar-border"></view>
+</view>

@@ -1,0 +1,40 @@
+{
+  "pages": [
+    "pages/menu/menu",
+    "pages/tienda/tienda",
+    "pages/perfil/perfil",
+    "pages/prejuego/prejuego",
+    "pages/juego/juego"
+  ],
+  "window": {
+    "defaultTitle": "TokArcade",
+    "titleBarColor": "#1a1a2e",
+    "backgroundColor": "#1a1a2e"
+  },
+  "tabBar": {
+    "custom": true,
+    "textColor": "#888888",
+    "selectedColor": "#e94560",
+    "backgroundColor": "#16213e",
+    "items": [
+      {
+        "pagePath": "pages/tienda/tienda",
+        "name": "Tienda",
+        "icon": "/images/icon_tienda.png",
+        "activeIcon": "/images/icon_tienda_active.png"
+      },
+      {
+        "pagePath": "pages/menu/menu",
+        "name": "Inicio",
+        "icon": "/images/icon_home.png",
+        "activeIcon": "/images/icon_home_active.png"
+      },
+      {
+        "pagePath": "pages/perfil/perfil",
+        "name": "Perfil",
+        "icon": "/images/icon_perfil.png",
+        "activeIcon": "/images/icon_perfil_active.png"
+      }
+    ]
+  }
+}

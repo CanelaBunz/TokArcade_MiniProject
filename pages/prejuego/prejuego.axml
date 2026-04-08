@@ -1,0 +1,36 @@
+<!-- PreJuego: Instrucciones y botón de inicio -->
+<!-- Equivalente a scenes/PreJuego.js del frontend Phaser -->
+<view class="page-container">
+  <top-bar puntos="{{puntos}}" />
+
+  <view class="content-area">
+    <!-- Botón Atrás -->
+    <view class="back-button-container">
+      <view class="btn-back" onTap="onBack">
+        <text class="btn-back-text">&lt;-</text>
+      </view>
+    </view>
+
+    <!-- Título del Juego -->
+    <view class="titulo-container">
+      <text class="juego-titulo">{{nombreJuego}}</text>
+    </view>
+
+    <!-- Sección Instrucciones -->
+    <view class="instrucciones-section">
+      <text class="instrucciones-label">Instrucciones</text>
+      <text class="instrucciones-text">{{loremText}}</text>
+    </view>
+
+    <!-- Botones de Acción -->
+    <view class="acciones-container">
+      <view class="btn-jugar" onTap="onJugar">
+        <text class="btn-jugar-text">Jugar</text>
+      </view>
+      
+      <view class="btn-leaderboard" onTap="onLeaderboard">
+        <text class="btn-leaderboard-text">🏆 Leaderboard</text>
+      </view>
+    </view>
+  </view>
+</view>

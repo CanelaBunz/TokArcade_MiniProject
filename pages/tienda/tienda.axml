@@ -1,0 +1,44 @@
+<!-- Tienda: Rack de premios -->
+<!-- Equivalente a scenes/Tienda.js del frontend Phaser -->
+<view class="page-container">
+  <top-bar puntos="{{puntos}}" />
+
+  <!-- Rack de premios -->
+  <view class="rack-container">
+
+    <!-- Techo de rayas rojas/blancas -->
+    <view class="techo">
+      <view
+        class="raya"
+        a:for="{{rayas}}"
+        a:key="index"
+        style="background-color: {{item.color}}"
+      ></view>
+    </view>
+
+    <!-- Estantes con premios -->
+    <view class="estantes">
+      <!-- Fila superior de premios -->
+      <view class="fila-premios">
+        <view class="premio-circle" a:for="{{[1,2,3]}}" a:key="*this"></view>
+      </view>
+      <!-- Divisor de estante -->
+      <view class="estante-divisor"></view>
+      <!-- Fila inferior de premios -->
+      <view class="fila-premios">
+        <view class="premio-circle" a:for="{{[1,2,3]}}" a:key="*this"></view>
+      </view>
+    </view>
+
+    <!-- Letrero "Premios" -->
+    <view class="letrero-premios">
+      <view class="letrero-bg">
+        <view class="letrero-texto-bg">
+          <text class="letrero-texto">Premios</text>
+        </view>
+      </view>
+    </view>
+
+
+  </view>
+</view>

@@ -1,0 +1,32 @@
+<!-- Perfil: Avatar, nombre y opciones del menú -->
+<!-- Equivalente a scenes/Perfil.js del frontend Phaser -->
+<view class="page-container">
+  <top-bar puntos="{{puntos}}" />
+
+  <!-- Avatar y Nombre -->
+  <view class="perfil-header">
+    <view class="avatar-container">
+      <view class="avatar-circle">
+        <text class="avatar-emoji">👤</text>
+      </view>
+    </view>
+    <view class="nombre-container">
+      <text class="nombre-usuario">{{usuario}}</text>
+      <view class="nombre-linea"></view>
+    </view>
+  </view>
+
+  <!-- Lista de Opciones -->
+  <view class="opciones-lista">
+    <view
+      class="opcion-item"
+      a:for="{{opciones}}"
+      a:key="label"
+      onTap="onTapOpcion"
+      data-label="{{item.label}}"
+    >
+      <text class="opcion-texto">{{item.label}}</text>
+      <text class="opcion-flecha">></text>
+    </view>
+  </view>
+</view>

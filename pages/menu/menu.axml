@@ -1,0 +1,25 @@
+<!-- Menú Principal: Grid de juegos -->
+<!-- Equivalente a scenes/MenuPrincipal.js del frontend Phaser -->
+<view class="page-container">
+  <top-bar puntos="{{puntos}}" />
+
+  <!-- Grid de tarjetas de juegos -->
+  <view class="juegos-grid">
+    <view
+      class="juego-card"
+      a:for="{{juegos}}"
+      a:key="id"
+      style="background-color: {{item.color}}"
+      onTap="onTapJuego"
+      data-id="{{item.id}}"
+      data-nombre="{{item.nombre}}"
+    >
+      <view class="juego-preview">
+        <image class="juego-icon" src="{{item.icon || '/images/icon_menu_juego_default.png'}}" mode="aspectFit" />
+      </view>
+      <view class="juego-info">
+        <text class="juego-nombre">{{item.nombreDisplay}}</text>
+      </view>
+    </view>
+  </view>
+</view>
