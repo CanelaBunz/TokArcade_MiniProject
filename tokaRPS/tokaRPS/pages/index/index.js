@@ -64,7 +64,7 @@ Page({
 
   startGame() {
     my.redirectTo({
-      url: '/pages/game/game'
+      url: '/tokaRPS/tokaRPS/pages/game/game'
     });
   }
 });

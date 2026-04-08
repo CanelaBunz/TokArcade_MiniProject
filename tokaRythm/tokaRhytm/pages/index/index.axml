@@ -1,0 +1,19 @@
+<view class="page">
+  <view class="title">TOKAT SAYS</view>
+
+  <view class="subtitle">Toka Rhythm</view>
+
+  <view class="description">
+    Memoriza la secuencia que muestra Tokat.
+
+    Repite los gestos en el mismo orden.
+    Desde la ronda 5 aparece el botón TAP.
+    Desde la ronda 5 también tendrás tiempo límite por gesto.
+
+    Ganas tokens en la ronda 5, 10 y cada 5 rondas después.
+  </view>
+
+  <view class="play-button" onTap="startGame">
+    JUGAR
+  </view>
+</view>

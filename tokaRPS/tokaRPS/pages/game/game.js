@@ -463,7 +463,7 @@ Page({
     });
   
     my.redirectTo({
-      url: `/pages/end/end?playerWon=${playerWon ? 1 : 0}&progress=${this.data.progress}&maxProgress=${this.data.maxProgress}`
+      url: `/tokaRPS/tokaRPS/pages/end/end?playerWon=${playerWon ? 1 : 0}&progress=${this.data.progress}&maxProgress=${this.data.maxProgress}`
     });
   },
 
