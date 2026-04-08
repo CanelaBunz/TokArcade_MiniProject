@@ -1,6 +1,7 @@
 .page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #1e1b2f, #0d0b1a);
+  /* Gradiente alineado con shell: #1a1a2e como base */
+  background: linear-gradient(180deg, #1a1a2e, #0d1020);
   padding: 40rpx 24rpx 50rpx;
   box-sizing: border-box;
   position: relative;
@@ -78,15 +79,17 @@
 
 .card {
   flex: 1;
-  min-height: 620rpx;
-  background: #1a1730;
-  border: 4rpx solid #7c3aed;
-  border-radius: 28rpx;
-  padding: 36rpx 28rpx;
+  min-height: 640rpx;
+  background: rgba(26, 23, 48, 0.7);
+  backdrop-filter: blur(10px);
+  border: 4rpx solid rgba(124, 58, 237, 0.6);
+  border-radius: 32rpx;
+  padding: 40rpx 32rpx;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-shadow: 0 12rpx 32rpx rgba(0, 0, 0, 0.4);
 }
 
 .card-emoji {
@@ -103,11 +106,13 @@
 }
 
 .card-desc {
-  margin-top: 20rpx;
-  font-size: 28rpx;
-  color: #9ca3af;
+  margin-top: 24rpx;
+  font-size: 32rpx;
+  color: #f1f5f9;
   text-align: center;
-  line-height: 1.5;
+  line-height: 1.6;
+  font-weight: 500;
+  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.3);
 }
 
 .divider {
@@ -119,17 +124,20 @@
 
 .modes-preview {
   margin-top: 44rpx;
-  font-size: 28rpx;
-  color: #6b7280;
+  font-size: 30rpx;
+  color: #a78bfa;
   text-align: center;
+  font-weight: bold;
 }
 
 .hint {
   margin-top: auto;
   padding-top: 40rpx;
-  font-size: 24rpx;
-  color: #4b5563;
+  font-size: 26rpx;
+  color: #8b5cf6;
   text-align: center;
+  letter-spacing: 2rpx;
+  opacity: 0.8;
 }
 
 .dots {
@@ -155,7 +163,7 @@
 }
 
 .play-btn {
-  margin: 46rpx auto 0;
+  margin: 40rpx auto 0;
   width: 320rpx;
   height: 96rpx;
   border-radius: 22rpx;
@@ -166,6 +174,34 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.leaderboard-btn {
+  margin: 24rpx auto 0;
+  width: 280rpx;
+  height: 80rpx;
+  border-radius: 18rpx;
+  background: rgba(124, 58, 237, 0.2);
+  border: 2rpx solid rgba(124, 58, 237, 0.5);
+  color: #c4b5fd;
+  font-size: 30rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.general-desc {
+  margin: 30rpx 40rpx 0;
+  font-size: 30rpx;
+  color: #f1f5f9;
+  text-align: center;
+  line-height: 1.5;
+  font-weight: 500;
+  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.3);
   position: relative;
   z-index: 2;
 }

@@ -1,6 +1,14 @@
 Page({
   data: {
-    tokatFrame: '/assets/tokat/frame0000.png'
+    tokatFrame: '/assets/tokat/frame0000.png',
+    idJuego: 'eyden-rps',
+    nombreJuego: 'TOKA RPS RHYTHM'
+  },
+
+  onLeaderboard() {
+    my.navigateTo({
+      url: `/pages/leaderboard/leaderboard?id=${this.data.idJuego}&nombre=${encodeURIComponent(this.data.nombreJuego)}`
+    });
   },
 
   onLoad() {

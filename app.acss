@@ -4,6 +4,8 @@
    ============================================ */
 
 /* --- Reset & Base --- */
+/* NOTA: font-family, font-size y color base se heredan desde aquí.
+   No repetir en páginas individuales. */
 page {
   background-color: #1a1a2e;
   color: #ffffff;
@@ -88,3 +90,50 @@ page {
 .bg-accent {
   background-color: #e94560;
 }
+
+/* --- Botones reutilizables (shell) --- */
+/* Uso: añadir clase .btn-shell-primary, etc. junto a clases propias de la página */
+.btn-shell-primary {
+  background-color: #43a047;
+  border: 4rpx solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 0 #2e7d32;
+}
+
+.btn-shell-primary:active {
+  transform: translateY(4rpx);
+  box-shadow: 0 4rpx 0 #2e7d32;
+}
+
+.btn-shell-secondary {
+  background-color: #3949ab;
+  border: 4rpx solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8rpx;
+}
+
+.btn-shell-danger {
+  background-color: #c0392b;
+  border: 4rpx solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- Overlay reutilizable --- */
+.overlay-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+

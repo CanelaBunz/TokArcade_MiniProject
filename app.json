@@ -3,7 +3,6 @@
     "pages/menu/menu",
     "pages/tienda/tienda",
     "pages/perfil/perfil",
-    "pages/prejuego/prejuego",
     "pages/juego/juego",
     "pages/leaderboard/leaderboard",
     "tokaRPS/tokaRPS/pages/index/index",

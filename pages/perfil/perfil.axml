@@ -6,7 +6,7 @@
   <!-- Avatar y Nombre -->
   <view class="perfil-header">
     <view class="avatar-container">
-      <view class="avatar-circle">
+      <view class="perfil-avatar-circle">
         <text class="avatar-emoji">👤</text>
       </view>
     </view>
@@ -30,3 +30,4 @@
     </view>
   </view>
 </view>
+

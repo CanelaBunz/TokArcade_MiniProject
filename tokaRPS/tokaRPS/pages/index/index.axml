@@ -8,17 +8,11 @@
   />
 
   <view class="description">
-    Llena la barra antes de que se acaben los 50 segundos.
-
-    Ganar = avanza mucho
-    Empatar = suma al contador
-    Cada 4 empates = se convierte en avance de victoria
-    Perder o tardarte = no avanzas
-
-    El ritmo se vuelve más rápido con el tiempo.
+    Enfrenta a tus oponentes al ritmo de la música y llena tu barra de victoria antes de que se agoten los 50 segundos. Cada acierto te permitirá avanzar hacia la meta, mientras que los empates se acumularán para otorgarte un impulso adicional en este duelo de piedra, papel o tijera.
   </view>
 
   <view class="play-button" onTap="startGame">
     JUGAR
   </view>
+  <view class="leaderboard-btn" onTap="onLeaderboard">Ranking</view>
 </view>

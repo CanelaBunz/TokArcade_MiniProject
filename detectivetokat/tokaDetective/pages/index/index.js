@@ -2,27 +2,32 @@ const CATEGORIES = [
   {
     id: 'cultura',
     name: 'Cultura Popular',
-    emoji: '🎬',
-    desc: 'Series, películas, música y más'
+    desc: 'Series, películas, música y más sobre la cultura actual.'
   },
   {
     id: 'arte',
     name: 'Arte y Literatura',
-    emoji: '🎨',
-    desc: 'Pintura, novelas, música clásica'
+    desc: 'Pintura, novelas y música clásica de todas las épocas.'
   },
   {
     id: 'historia',
     name: 'Historia',
-    emoji: '🏛️',
-    desc: 'Civilizaciones, eventos y personajes'
+    desc: 'Civilizaciones antiguas, grandes eventos y personajes históricos.'
   }
 ];
 
 Page({
   data: {
     selectedIndex: 0,
-    currentCategory: CATEGORIES[0]
+    currentCategory: CATEGORIES[0],
+    idJuego: 'detective-tokat',
+    nombreJuego: 'DETECTIVE TOKAT'
+  },
+
+  onLeaderboard() {
+    my.navigateTo({
+      url: `/pages/leaderboard/leaderboard?id=${this.data.idJuego}&nombre=${encodeURIComponent(this.data.nombreJuego)}`
+    });
   },
 
   prevCategory() {

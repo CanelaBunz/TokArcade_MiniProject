@@ -141,7 +141,9 @@ Page({
       showLives,
       lives,
       livesText: this.getLivesText(lives),
-      counterText: this.getCounterText(0, totalQuestions)
+      counterText: this.getCounterText(0, totalQuestions),
+      showTutorial: false,
+      tutorialDone: true
     });
 
     this.remainingMs = TIMER_SECONDS * 1000;
@@ -150,6 +152,9 @@ Page({
     this.timerTimeout = null;
     this.resultDelay = null;
     this.rect = null; // Store measurement
+
+    // Auto-start game
+    this.startWalk();
   },
 
   onUnload() {

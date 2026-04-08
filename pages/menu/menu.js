@@ -1,5 +1,11 @@
 const app = getApp();
 
+const GAME_ROUTES = {
+  'detective-tokat': '/detectivetokat/tokaDetective/pages/index/index',
+  'tokat-says':      '/tokaRythm/tokaRhytm/pages/index/index',
+  'eyden-rps':       '/tokaRPS/tokaRPS/pages/index/index'
+};
+
 Page({
   data: {
     puntos: 0,
@@ -13,16 +19,15 @@ Page({
   onShow() {
     this.setData({ puntos: app.globalData.puntos });
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().setData({
-        selected: 1
-      });
+      this.getTabBar().setData({ selected: 1 });
     }
   },
 
   onTapJuego(e) {
     const { id, nombre } = e.currentTarget.dataset;
-    my.navigateTo({
-      url: `../prejuego/prejuego?id=${id}&nombre=${encodeURIComponent(nombre)}`
-    });
+    const route = GAME_ROUTES[id];
+    if (route) {
+      my.navigateTo({ url: `${route}?id=${id}&nombre=${encodeURIComponent(nombre)}` });
+    }
   }
 });

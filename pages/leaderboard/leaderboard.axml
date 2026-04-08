@@ -23,7 +23,7 @@
     <view class="podium-area">
       <!-- 2nd Place -->
       <view class="podium-item place-2">
-        <view class="avatar-container border-silver">
+        <view class="leader-avatar border-silver">
           <image class="avatar-img" src="{{topPlayers[1].avatar || '/images/default_avatar.png'}}" />
           <view class="rank-badge bg-silver">2</view>
         </view>
@@ -36,7 +36,7 @@
       <!-- 1st Place -->
       <view class="podium-item place-1">
         <image class="crown-icon" src="/images/crown.png" />
-        <view class="avatar-container border-gold">
+        <view class="leader-avatar border-gold">
           <image class="avatar-img" src="{{topPlayers[0].avatar || '/images/default_avatar.png'}}" />
           <view class="rank-badge bg-gold">1</view>
         </view>
@@ -48,7 +48,7 @@
 
       <!-- 3rd Place -->
       <view class="podium-item place-3">
-        <view class="avatar-container border-bronze">
+        <view class="leader-avatar border-bronze">
           <image class="avatar-img" src="{{topPlayers[2].avatar || '/images/default_avatar.png'}}" />
           <view class="rank-badge bg-bronze">3</view>
         </view>

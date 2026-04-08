@@ -1,9 +1,9 @@
 /* TopBar — Barra superior */
 /* Equivale a la TopBar de 100px del Phaser (200rpx en mini app) */
 
+/* background-color heredado de page{} en app.acss */
 .top-bar {
   width: 100%;
-  background-color: #1a1a2e;
   position: relative;
 }
 
@@ -27,10 +27,10 @@
   padding: 10rpx 30rpx;
 }
 
+/* color y font-family heredados de page{} en app.acss */
 .puntos-text {
   color: #e94560;
   font-size: 26rpx;
-  font-family: Courier, monospace;
   font-weight: bold;
 }
 

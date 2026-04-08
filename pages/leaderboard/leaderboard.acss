@@ -1,6 +1,6 @@
+/* background-color heredado de page{} en app.acss */
 .leaderboard-page {
   min-height: 100vh;
-  background-color: #1a1a2e;
   padding-bottom: 40rpx;
 }
 
@@ -82,7 +82,8 @@
   position: relative;
 }
 
-.avatar-container {
+/* Renombrado de .avatar-container para evitar colisión con perfil.acss */
+.leader-avatar {
   width: 120rpx;
   height: 120rpx;
   border-radius: 50%;
@@ -150,7 +151,7 @@
   transform: translateY(-40rpx);
 }
 
-.place-1 .avatar-container {
+.place-1 .leader-avatar {
   width: 150rpx;
   height: 150rpx;
 }

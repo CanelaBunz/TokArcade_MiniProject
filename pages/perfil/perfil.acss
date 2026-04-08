@@ -12,7 +12,8 @@
   flex-shrink: 0;
 }
 
-.avatar-circle {
+/* Renombrada de .avatar-circle para evitar colisión con leaderboard.acss */
+.perfil-avatar-circle {
   width: 170rpx;
   height: 170rpx;
   border-radius: 50%;
@@ -32,10 +33,9 @@
   flex: 1;
 }
 
+/* color y font-family heredados de page{} en app.acss */
 .nombre-usuario {
-  color: #ffffff;
   font-size: 38rpx;
-  font-family: Courier, monospace;
   font-weight: bold;
 }
 
@@ -63,16 +63,15 @@
   border-radius: 8rpx;
 }
 
+/* font-family heredado de page{} en app.acss */
 .opcion-texto {
   color: #aaaaaa;
   font-size: 32rpx;
-  font-family: Courier, monospace;
   font-weight: bold;
 }
 
 .opcion-flecha {
   color: #e94560;
   font-size: 32rpx;
-  font-family: Courier, monospace;
   font-weight: bold;
 }

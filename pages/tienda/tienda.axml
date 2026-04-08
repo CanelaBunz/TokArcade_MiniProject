@@ -8,7 +8,7 @@
     <view class="brands-grid">
       <view class="brand-item" a:for="{{marcas}}" a:key="id" onTap="onTapMarca" data-id="{{item.id}}">
         <view class="brand-circle" style="background-color: {{item.color}}">
-          <!-- Logo de la empresa (placeholder si no existe) -->
+          <!-- Logo de la empresa -->
           <image class="brand-logo" src="{{item.logo}}" mode="aspectFit" />
         </view>
         <text class="brand-name">{{item.nombre}}</text>
@@ -16,8 +16,8 @@
     </view>
   </view>
 
-  <!-- Modal Kiosco (Tiendita) -->
-  <view class="modal-overlay {{showKiosco ? 'modal-active' : ''}}" a:if="{{showKiosco}}">
+  <!-- Modal Kiosco (Tiendita) — clase renombrada para evitar conflicto CSS -->
+  <view class="tienda-modal-overlay" a:if="{{showKiosco}}">
     <view class="kiosco-card">
       
       <!-- Techo del Kiosco -->
@@ -49,4 +49,4 @@
     </view>
   </view>
 </view>
-</view>
+

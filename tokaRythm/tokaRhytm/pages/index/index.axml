@@ -4,16 +4,11 @@
   <view class="subtitle">Toka Rhythm</view>
 
   <view class="description">
-    Memoriza la secuencia que muestra Tokat.
-
-    Repite los gestos en el mismo orden.
-    Desde la ronda 5 aparece el botón TAP.
-    Desde la ronda 5 también tendrás tiempo límite por gesto.
-
-    Ganas tokens en la ronda 5, 10 y cada 5 rondas después.
+    Memoriza con precisión la secuencia de gestos que muestra Tokat y repítelos en el mismo orden para avanzar. A medida que superes las rondas, el desafío aumentará con límites de tiempo reducidos y nuevos controles táctiles que pondrán a prueba tus reflejos y concentración.
   </view>
 
   <view class="play-button" onTap="startGame">
     JUGAR
   </view>
+  <view class="leaderboard-btn" onTap="onLeaderboard">Ranking</view>
 </view>
