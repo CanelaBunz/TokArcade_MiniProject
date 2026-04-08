@@ -63,13 +63,13 @@ Page({
 
   retryGame() {
     my.redirectTo({
-      url: `/pages/game/game?category=${this.data.category}&mode=${this.data.mode}&totalQuestions=${this.data.totalQuestions}`
+      url: `/detectivetokat/tokaDetective/pages/game/game?category=${this.data.category}&mode=${this.data.mode}&totalQuestions=${this.data.totalQuestions}`
     });
   },
 
   goMenu() {
     my.redirectTo({
-      url: '/pages/index/index'
+      url: `/detectivetokat/tokaDetective/pages/index/index`
     });
   }
 });

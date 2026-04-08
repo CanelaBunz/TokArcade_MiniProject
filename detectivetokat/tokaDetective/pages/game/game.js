@@ -453,7 +453,7 @@ Page({
 
     const total = this.data.totalQuestions > 0 ? this.data.totalQuestions : this.data.currentIndex;
     my.redirectTo({
-      url: `/pages/end/end?score=${this.data.score}&correct=${this.data.correctCount}&total=${total}&category=${this.data.category}&mode=${this.data.mode}&totalQuestions=${this.data.totalQuestions}`
+      url: `/detectivetokat/tokaDetective/pages/end/end?score=${this.data.score}&correct=${this.data.correctCount}&total=${total}&category=${this.data.category}&mode=${this.data.mode}&totalQuestions=${this.data.totalQuestions}`
     });
   }
 });

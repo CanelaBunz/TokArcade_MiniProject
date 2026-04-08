@@ -67,7 +67,7 @@ Page({
     const category = this.data.currentCategory;
 
     my.redirectTo({
-      url: `/pages/game/game?category=${category.id}&mode=${mode.id}&totalQuestions=${mode.questions}`
+      url: `/detectivetokat/tokaDetective/pages/game/game?category=${category.id}&mode=${mode.id}&totalQuestions=${mode.questions}`
     });
   }
 });

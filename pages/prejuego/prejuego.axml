@@ -19,7 +19,7 @@
     <!-- Sección Instrucciones -->
     <view class="instrucciones-section">
       <text class="instrucciones-label">Instrucciones</text>
-      <text class="instrucciones-text">{{loremText}}</text>
+      <text class="instrucciones-text">{{instrucciones}}</text>
     </view>
 
     <!-- Botones de Acción -->

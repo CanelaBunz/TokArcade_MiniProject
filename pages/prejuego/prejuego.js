@@ -1,17 +1,36 @@
 const app = getApp();
 
+const GAME_INFO = {
+  'detective-tokat': {
+    instrucciones: "¡Hola Detective! Alguien ha robado los archivos secretos de Tokat. Tu misión es recuperarlos respondiendo preguntas sobre Cultura, Arte o Historia.\n\nElige tu categoría y nivel de dificultad para comenzar la investigación. ¡Buena suerte!",
+    route: '/detectivetokat/tokaDetective/pages/index/index'
+  },
+  'tokat-says': {
+    instrucciones: "¡Sigue el ritmo de Tokat! Repite la secuencia de colores que Tokat te muestra. Cada nivel la secuencia será más larga y rápida. ¡No te equivoques!",
+    route: '/pages/juego/juego' 
+  },
+  'eyden-rps': {
+    instrucciones: "¡Piedra, Papel o Tijera al ritmo de la música! Derrota a tus oponentes siguiendo el compás. Toca el gesto correcto en el momento preciso.",
+    route: '/pages/juego/juego'
+  }
+};
+
 Page({
   data: {
     puntos: 0,
     nombreJuego: '',
     idJuego: '',
-    loremText: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\nUt enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.`
+    instrucciones: ''
   },
 
   onLoad(query) {
+    const id = query.id || '';
+    const info = GAME_INFO[id] || { instrucciones: 'Cargando instrucciones...' };
+
     this.setData({
-      idJuego: query.id || '',
-      nombreJuego: decodeURIComponent(query.nombre || 'NOMBRE DEL JUEGO')
+      idJuego: id,
+      nombreJuego: decodeURIComponent(query.nombre || 'NOMBRE DEL JUEGO'),
+      instrucciones: info.instrucciones
     });
   },
 
@@ -24,9 +43,12 @@ Page({
   },
 
   onJugar() {
-    my.navigateTo({
-      url: `../juego/juego?id=${this.data.idJuego}&nombre=${encodeURIComponent(this.data.nombreJuego)}`
-    });
+    const info = GAME_INFO[this.data.idJuego];
+    const url = info && info.route ? 
+      `${info.route}?id=${this.data.idJuego}&nombre=${encodeURIComponent(this.data.nombreJuego)}` :
+      `../juego/juego?id=${this.data.idJuego}&nombre=${encodeURIComponent(this.data.nombreJuego)}`;
+
+    my.navigateTo({ url });
   },
 
   onLeaderboard() {
