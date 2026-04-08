@@ -1,0 +1,59 @@
+.page {
+  min-height: 100vh;
+  background: #111111;
+  padding: 70rpx 32rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  margin-top: 80rpx;
+  font-size: 60rpx;
+  font-weight: bold;
+  text-align: center;
+}
+
+.subtitle {
+  margin-top: 60rpx;
+  font-size: 34rpx;
+  color: #ffffff;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.progress-text {
+  margin-top: 50rpx;
+  font-size: 34rpx;
+  color: #dfe6e9;
+  text-align: center;
+}
+
+.retry-button {
+  margin-top: 90rpx;
+  width: 340rpx;
+  height: 100rpx;
+  border-radius: 20rpx;
+  background: #0984e3;
+  color: #ffffff;
+  font-size: 34rpx;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-button {
+  margin-top: 28rpx;
+  width: 340rpx;
+  height: 88rpx;
+  border-radius: 20rpx;
+  background: #636e72;
+  color: #ffffff;
+  font-size: 30rpx;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

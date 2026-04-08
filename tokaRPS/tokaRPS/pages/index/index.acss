@@ -1,0 +1,46 @@
+.page {
+  min-height: 100vh;
+  background: #111111;
+  padding: 60rpx 32rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  margin-top: 60rpx;
+  font-size: 52rpx;
+  color: #ffffff;
+  font-weight: bold;
+  text-align: center;
+}
+
+.tokat-sprite {
+  width: 360rpx;
+  height: 360rpx;
+  margin-top: 36rpx;
+}
+
+.description {
+  margin-top: 36rpx;
+  font-size: 30rpx;
+  color: #d9d9d9;
+  text-align: center;
+  line-height: 1.8;
+  white-space: pre-line;
+}
+
+.play-button {
+  margin-top: 70rpx;
+  width: 320rpx;
+  height: 96rpx;
+  border-radius: 20rpx;
+  background: #00b894;
+  color: #ffffff;
+  font-size: 34rpx;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
