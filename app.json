@@ -5,6 +5,7 @@
     "pages/perfil/perfil",
     "pages/prejuego/prejuego",
     "pages/juego/juego",
+    "pages/leaderboard/leaderboard",
     "tokaRPS/tokaRPS/pages/index/index",
     "tokaRPS/tokaRPS/pages/game/game",
     "tokaRPS/tokaRPS/pages/end/end",

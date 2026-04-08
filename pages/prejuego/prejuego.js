@@ -52,9 +52,8 @@ Page({
   },
 
   onLeaderboard() {
-    my.showToast({
-      content: 'Leaderboard próximamente',
-      type: 'none'
+    my.navigateTo({
+      url: `/pages/leaderboard/leaderboard?id=${this.data.idJuego}&nombre=${encodeURIComponent(this.data.nombreJuego)}`
     });
   }
 });

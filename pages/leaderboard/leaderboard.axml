@@ -1,0 +1,82 @@
+<view class="leaderboard-page">
+  <top-bar puntos="{{puntos}}" />
+
+  <view class="board-container">
+    <!-- Botón Atrás -->
+    <view class="back-nav" onTap="onBack">
+      <text class="back-arrow">←</text>
+      <text class="back-text">REGRESAR</text>
+    </view>
+
+    <!-- Header & Countdown -->
+    <view class="header-section">
+      <text class="game-title">{{nombreJuego}}</text>
+      <view class="countdown-wrapper">
+        <text class="countdown-label">TIEMPO RESTANTE:</text>
+        <view class="timer-box">
+          <text class="timer-text">{{countdownText}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Podium Section -->
+    <view class="podium-area">
+      <!-- 2nd Place -->
+      <view class="podium-item place-2">
+        <view class="avatar-container border-silver">
+          <image class="avatar-img" src="{{topPlayers[1].avatar || '/images/default_avatar.png'}}" />
+          <view class="rank-badge bg-silver">2</view>
+        </view>
+        <text class="player-name">{{topPlayers[1].name}}</text>
+        <text class="player-score">{{topPlayers[1].score}} pts</text>
+        <view class="reward-pill silver">1 CUPÓN</view>
+        <view class="podium-base base-silver"></view>
+      </view>
+
+      <!-- 1st Place -->
+      <view class="podium-item place-1">
+        <image class="crown-icon" src="/images/crown.png" />
+        <view class="avatar-container border-gold">
+          <image class="avatar-img" src="{{topPlayers[0].avatar || '/images/default_avatar.png'}}" />
+          <view class="rank-badge bg-gold">1</view>
+        </view>
+        <text class="player-name">{{topPlayers[0].name}}</text>
+        <text class="player-score">{{topPlayers[0].score}} pts</text>
+        <view class="reward-pill gold">2 CUPONES</view>
+        <view class="podium-base base-gold"></view>
+      </view>
+
+      <!-- 3rd Place -->
+      <view class="podium-item place-3">
+        <view class="avatar-container border-bronze">
+          <image class="avatar-img" src="{{topPlayers[2].avatar || '/images/default_avatar.png'}}" />
+          <view class="rank-badge bg-bronze">3</view>
+        </view>
+        <text class="player-name">{{topPlayers[2].name}}</text>
+        <text class="player-score">{{topPlayers[2].score}} pts</text>
+        <view class="reward-pill bronze">100 PTS</view>
+        <view class="podium-base base-bronze"></view>
+      </view>
+    </view>
+
+    <!-- Scores Table -->
+    <view class="scores-section">
+      <view class="table-header">
+        <text class="col-rank">#</text>
+        <text class="col-user">JUGADOR</text>
+        <text class="col-score">PUNTOS</text>
+      </view>
+      
+      <scroll-view scroll-y class="table-body">
+        <view a:for="{{otherPlayers}}" a:key="rank" class="table-row {{item.isUser ? 'user-row' : ''}}">
+          <text class="col-rank">{{item.rank}}</text>
+          <view class="col-user user-info">
+            <image class="row-avatar" src="{{item.avatar || '/images/default_avatar.png'}}" />
+            <text class="row-name">{{item.name}}</text>
+          </view>
+          <text class="col-score">{{item.score}}</text>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+</view>
