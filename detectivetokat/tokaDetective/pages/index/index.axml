@@ -18,8 +18,8 @@
 
       <view class="divider"></view>
 
-      <view class="modes-preview">⚡ 10   📚 20   ♾️ Infinito</view>
-      <view class="hint">— Pulsa JUGAR para elegir modo —</view>
+      <view class="modes-preview">♾️ Modo Infinito · 3 vidas</view>
+      <view class="hint">— Pulsa JUGAR para comenzar —</view>
     </view>
 
     <view class="arrow right" onTap="nextCategory">›</view>
@@ -32,29 +32,4 @@
   </view>
 
   <view class="play-btn" onTap="openModeModal">JUGAR</view>
-
-  <view a:if="{{showModeModal}}" class="modal-overlay">
-    <view class="modal-card">
-      <view class="modal-emoji">{{currentCategory.emoji}}</view>
-      <view class="modal-title">{{currentCategory.name}}</view>
-      <view class="modal-subtitle">— Elige un modo —</view>
-
-      <view class="mode-item" data-mode="short" onTap="selectMode">
-        <view class="mode-label">⚡ 10 Preguntas</view>
-        <view class="mode-sub">Sesión Corta</view>
-      </view>
-
-      <view class="mode-item" data-mode="medium" onTap="selectMode">
-        <view class="mode-label">📚 20 Preguntas</view>
-        <view class="mode-sub">Sesión Media</view>
-      </view>
-
-      <view class="mode-item" data-mode="infinite" onTap="selectMode">
-        <view class="mode-label">♾️ Infinito</view>
-        <view class="mode-sub">3 vidas · Sin límite</view>
-      </view>
-
-      <view class="cancel-btn" onTap="closeModeModal">Cancelar</view>
-    </view>
-  </view>
 </view>

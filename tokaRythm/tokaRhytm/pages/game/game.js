@@ -30,7 +30,11 @@ Page({
     downOpacity: 0.4,
     leftOpacity: 0.4,
     rightOpacity: 0.4,
-    tapOpacity: 0.4
+    tapOpacity: 0.4,
+
+    isPaused: false,
+    isCountingDown: false,
+    countdownText: ''
   },
 
   onLoad() {
@@ -134,6 +138,8 @@ Page({
   },
 
   showSequence() {
+    if (this.data.isPaused || this.data.isCountingDown) return;
+
     const sequence = this.data.sequence;
     const speed = this.data.showSpeed;
 
@@ -141,7 +147,7 @@ Page({
 
     sequence.forEach((gesture, index) => {
       const timer = setTimeout(() => {
-        if (this.data.gameOver) return;
+        if (this.data.gameOver || this.data.isPaused || this.data.isCountingDown) return;
 
         const color = this.gestureColors[gesture] || '#ffffff';
 
@@ -154,7 +160,7 @@ Page({
         this.flashGesture(gesture);
 
         const resetTimer = setTimeout(() => {
-          if (this.data.gameOver) return;
+          if (this.data.gameOver || this.data.isPaused || this.data.isCountingDown) return;
           this.setData({
             tokatBorderColor: '#38BDF8'
           });
@@ -167,7 +173,7 @@ Page({
     });
 
     const turnTimer = setTimeout(() => {
-      if (this.data.gameOver) return;
+      if (this.data.gameOver || this.data.isPaused || this.data.isCountingDown) return;
       this.startPlayerTurn();
     }, speed * (sequence.length + 1.5));
 
@@ -175,6 +181,8 @@ Page({
   },
 
   startPlayerTurn() {
+    if (this.data.isPaused || this.data.isCountingDown) return;
+
     this.setData({
       isShowingSequence: false,
       isPlayerTurn: true,
@@ -207,7 +215,7 @@ Page({
     });
 
     this.gestureTimerInterval = setInterval(() => {
-      if (this.data.gameOver || !this.data.isPlayerTurn) {
+      if (this.data.gameOver || !this.data.isPlayerTurn || this.data.isPaused || this.data.isCountingDown) {
         this.clearGestureTimer();
         return;
       }
@@ -232,7 +240,7 @@ Page({
     }, 50);
 
     this.gestureTimerTimeout = setTimeout(() => {
-      if (this.data.gameOver || !this.data.isPlayerTurn) return;
+      if (this.data.gameOver || !this.data.isPlayerTurn || this.data.isPaused || this.data.isCountingDown) return;
       this.endGame();
     }, total);
   },
@@ -240,7 +248,7 @@ Page({
   onGestureTap(e) {
     const gesture = e.currentTarget.dataset.gesture;
 
-    if (!this.data.isPlayerTurn || this.data.gameOver) return;
+    if (!this.data.isPlayerTurn || this.data.gameOver || this.data.isPaused || this.data.isCountingDown) return;
 
     if (gesture === '✦' && !this.data.showTapButton) return;
 
@@ -294,7 +302,7 @@ Page({
     });
 
     this.nextRoundTimeout = setTimeout(() => {
-      if (!this.data.gameOver) {
+      if (!this.data.gameOver && !this.data.isPaused && !this.data.isCountingDown) {
         this.nextRound();
       }
     }, 1200);
@@ -375,7 +383,7 @@ Page({
 
   scheduleOpacityReset(key, value) {
     const timer = setTimeout(() => {
-      if (this.data.gameOver) return;
+      if (this.data.gameOver || this.data.isPaused || this.data.isCountingDown) return;
       const payload = {};
       payload[key] = value;
       this.setData(payload);
@@ -416,5 +424,53 @@ Page({
       this.flashTimeouts.forEach(timer => clearTimeout(timer));
     }
     this.flashTimeouts = [];
+    if (this.countdownInterval) clearInterval(this.countdownInterval);
+  },
+
+  togglePause() {
+    if (this.data.gameOver || this.data.isCountingDown || this.data.showStartButton) return;
+
+    if (!this.data.isPaused) {
+      // Pause
+      this.cleanupTimers();
+      this.setData({ isPaused: true });
+    } else {
+      // Resume via countdown
+      this.startCountdown();
+    }
+  },
+
+  startCountdown() {
+    this.setData({
+      isPaused: false,
+      isCountingDown: true,
+      countdownText: "3"
+    });
+
+    let count = 3;
+    this.countdownInterval = setInterval(() => {
+      count--;
+      if (count > 0) {
+        this.setData({ countdownText: count.toString() });
+      } else if (count === 0) {
+        this.setData({ countdownText: "¡YA!" });
+      } else {
+        clearInterval(this.countdownInterval);
+        this.setData({ isCountingDown: false });
+        
+        // Resume logic: repeat sequence or resume turn
+        if (this.data.isShowingSequence) {
+          this.showSequence();
+        } else if (this.data.isPlayerTurn) {
+          this.startPlayerTurn();
+        }
+      }
+    }, 1000);
+  },
+
+  exitGame() {
+    my.redirectTo({
+      url: '/tokaRythm/tokaRhytm/pages/index/index'
+    });
   }
 });

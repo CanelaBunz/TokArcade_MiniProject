@@ -115,6 +115,7 @@ Page({
     showTutorial: true,
     tutorialDone: false,
 
+    isPaused: false,
     gameEnded: false
   },
 
@@ -140,6 +141,7 @@ Page({
       counterText: this.getCounterText(0, totalQuestions)
     });
 
+    this.remainingMs = TIMER_SECONDS * 1000;
     this.walkTimer = null;
     this.timerInterval = null;
     this.timerTimeout = null;
@@ -223,18 +225,19 @@ Page({
       counterText: this.getCounterText(this.data.currentIndex, this.data.totalQuestions)
     });
 
+    this.remainingMs = TIMER_SECONDS * 1000;
     this.startQuestionTimer();
   },
 
   startQuestionTimer() {
     this.clearQuestionTimers();
 
-    let remainingMs = TIMER_SECONDS * 1000;
-
     this.timerInterval = setInterval(() => {
-      remainingMs -= 100;
+      if (this.data.isPaused) return;
 
-      const seconds = Math.max(0, Math.ceil(remainingMs / 1000));
+      this.remainingMs -= 100;
+
+      const seconds = Math.max(0, Math.ceil(this.remainingMs / 1000));
       let color = '#9ca3af';
 
       if (seconds <= 5) color = '#ef4444';
@@ -245,10 +248,31 @@ Page({
         timerColor: color
       });
 
-      if (remainingMs <= 0) {
+      if (this.remainingMs <= 0) {
         this.handleTimeExpired();
       }
     }, 100);
+  },
+
+  togglePause() {
+    if (this.data.gameEnded || this.data.showTutorial) return;
+
+    const nextPaused = !this.data.isPaused;
+    this.setData({
+      isPaused: nextPaused
+    });
+  },
+
+  resumeGame() {
+    this.setData({
+      isPaused: false
+    });
+  },
+
+  exitGame() {
+    my.redirectTo({
+      url: '/detectivetokat/tokaDetective/pages/index/index'
+    });
   },
 
   clearQuestionTimers() {

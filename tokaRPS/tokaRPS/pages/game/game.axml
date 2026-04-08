@@ -1,4 +1,6 @@
 <view class="page">
+  <view class="pause-button-top" onTap="togglePause">⏸</view>
+  
   <view class="title">Toka Rock Paper Scissors</view>
 
   <view class="hud">
@@ -52,6 +54,20 @@
     >
       Tijeras
     </view>
+  </view>
+
+  <!-- Pause Overlay -->
+  <view a:if="{{isPaused}}" class="modal-overlay">
+    <view class="modal-card">
+      <text class="modal-title">JUEGO EN PAUSA</text>
+      <view class="modal-btn resume" onTap="togglePause">Continuar</view>
+      <view class="modal-btn exit" onTap="exitGame">Salir</view>
+    </view>
+  </view>
+
+  <!-- Countdown Overlay -->
+  <view a:if="{{isCountingDown}}" class="modal-overlay countdown-overlay">
+    <text class="countdown-number">{{countdownText}}</text>
   </view>
 
 </view>

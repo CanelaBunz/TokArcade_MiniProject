@@ -305,3 +305,34 @@
   line-height: 1.55;
   color: #9ca3af;
 }
+
+/* Pause Button Styles */
+.pause-btn {
+  font-size: 32rpx;
+  color: #ffffff;
+  padding: 10rpx 40rpx;
+  background: rgba(124, 58, 237, 0.3);
+  border: 2rpx solid #7c3aed;
+  border-radius: 12rpx;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pause-btn:active {
+  transform: scale(0.9);
+  background: rgba(124, 58, 117, 0.5);
+}
+
+/* Pause Overlay Styles */
+.pause-overlay .overlay-title {
+  margin-bottom: 20rpx;
+  font-size: 44rpx;
+  color: #3e2723;
+  text-transform: uppercase;
+  letter-spacing: 2rpx;
+}
+
+.exit-btn {
+  background: #ef4444 !important;
+  margin-top: 20rpx !important;
+}

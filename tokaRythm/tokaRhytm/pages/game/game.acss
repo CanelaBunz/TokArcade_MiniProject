@@ -3,6 +3,29 @@
   background: linear-gradient(180deg, #0f172a, #1e293b);
   padding: 30rpx 24rpx 40rpx;
   box-sizing: border-box;
+  position: relative;
+}
+
+.pause-button-top {
+  position: absolute;
+  top: 30rpx;
+  right: 24rpx;
+  width: 80rpx;
+  height: 80rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
+  font-size: 32rpx;
+  border-radius: 50%;
+  border: 2rpx solid rgba(56, 189, 248, 0.3);
+  z-index: 10;
+}
+
+.pause-button-top:active {
+  transform: scale(0.9);
+  background: rgba(56, 189, 248, 0.2);
 }
 
 .header {
@@ -165,4 +188,75 @@
   background: rgba(168, 85, 247, 0.25);
   border: 4rpx solid rgba(168, 85, 247, 0.6);
   font-size: 44rpx;
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.modal-card {
+  width: 80%;
+  background: #1e293b;
+  border: 4rpx solid #38bdf8;
+  border-radius: 32rpx;
+  padding: 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modal-title {
+  color: white;
+  font-size: 44rpx;
+  font-weight: bold;
+  margin-bottom: 40rpx;
+}
+
+.modal-btn {
+  width: 100%;
+  height: 90rpx;
+  border-radius: 20rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+}
+
+.modal-btn.resume {
+  background: #38bdf8;
+  color: white;
+}
+
+.modal-btn.exit {
+  background: #ef4444;
+  color: white;
+}
+
+/* Countdown */
+.countdown-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.countdown-number {
+  color: white;
+  font-size: 180rpx;
+  font-weight: bold;
+  animation: countdownPop 0.5s ease-out;
+}
+
+@keyframes countdownPop {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }

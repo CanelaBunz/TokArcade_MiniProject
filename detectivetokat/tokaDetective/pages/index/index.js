@@ -19,17 +19,10 @@ const CATEGORIES = [
   }
 ];
 
-const MODES = {
-  short: { id: 'short', questions: 10 },
-  medium: { id: 'medium', questions: 20 },
-  infinite: { id: 'infinite', questions: -1 }
-};
-
 Page({
   data: {
     selectedIndex: 0,
-    currentCategory: CATEGORIES[0],
-    showModeModal: false
+    currentCategory: CATEGORIES[0]
   },
 
   prevCategory() {
@@ -50,24 +43,9 @@ Page({
   },
 
   openModeModal() {
-    this.setData({
-      showModeModal: true
-    });
-  },
-
-  closeModeModal() {
-    this.setData({
-      showModeModal: false
-    });
-  },
-
-  selectMode(e) {
-    const modeId = e.currentTarget.dataset.mode;
-    const mode = MODES[modeId];
     const category = this.data.currentCategory;
-
     my.redirectTo({
-      url: `/detectivetokat/tokaDetective/pages/game/game?category=${category.id}&mode=${mode.id}&totalQuestions=${mode.questions}`
+      url: `/detectivetokat/tokaDetective/pages/game/game?category=${category.id}&mode=infinite&totalQuestions=-1`
     });
   }
 });

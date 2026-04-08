@@ -5,8 +5,6 @@ const CATEGORY_NAMES = {
 };
 
 const MODE_LABELS = {
-  short: '⚡ Sesión Corta · 10 preguntas',
-  medium: '📚 Sesión Media · 20 preguntas',
   infinite: '♾️ Modo Infinito · 3 vidas'
 };
 
@@ -23,8 +21,8 @@ Page({
     titleColor: '#ef4444',
     footerText: '',
     category: 'cultura',
-    mode: 'short',
-    totalQuestions: 10,
+    mode: 'infinite',
+    totalQuestions: -1,
     categoryLabel: '',
     modeLabel: ''
   },
@@ -39,8 +37,8 @@ Page({
     const won = precision >= 60;
 
     const category = query.category || 'cultura';
-    const mode = query.mode || 'short';
-    const totalQuestions = Number(query.totalQuestions || 10);
+    const mode = query.mode || 'infinite';
+    const totalQuestions = Number(query.totalQuestions || -1);
 
     this.setData({
       score,
@@ -63,7 +61,7 @@ Page({
 
   retryGame() {
     my.redirectTo({
-      url: `/detectivetokat/tokaDetective/pages/game/game?category=${this.data.category}&mode=${this.data.mode}&totalQuestions=${this.data.totalQuestions}`
+      url: `/detectivetokat/tokaDetective/pages/game/game?category=${this.data.category}&mode=infinite&totalQuestions=-1`
     });
   },
 

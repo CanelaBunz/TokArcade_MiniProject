@@ -38,7 +38,11 @@ Page({
     enemyChoiceText: "",
 
     finalTitle: "",
-    finalMessage: ""
+    finalMessage: "",
+
+    isPaused: false,
+    isCountingDown: false,
+    countdownText: ""
   },
 
   onLoad() {
@@ -111,8 +115,9 @@ Page({
   },
 
   startGlobalTimer() {
+    this.clearGlobalTimer();
     this.globalTimer = setInterval(() => {
-      if (this.data.gameEnded) return;
+      if (this.data.gameEnded || this.data.isPaused || this.data.isCountingDown) return;
 
       const nextRemaining = Math.max(0, this.data.remainingTime - 100);
 
@@ -237,7 +242,7 @@ Page({
   },
 
   startExchange() {
-    if (this.data.gameEnded) return;
+    if (this.data.gameEnded || this.data.isPaused || this.data.isCountingDown) return;
 
     this.clearRoundTimers();
 
@@ -295,7 +300,7 @@ Page({
   onChoiceTap(e) {
     const choice = e.currentTarget.dataset.choice;
 
-    if (this.data.gameEnded || this.data.roundResolved || this.data.inputLocked) {
+    if (this.data.gameEnded || this.data.roundResolved || this.data.inputLocked || this.data.isPaused || this.data.isCountingDown) {
       return;
     }
 
@@ -430,7 +435,7 @@ Page({
 
   queueNextExchange(delay) {
     this.nextExchangeTimer = setTimeout(() => {
-      if (this.data.gameEnded) return;
+      if (this.data.gameEnded || this.data.isPaused || this.data.isCountingDown) return;
       this.startExchange();
     }, delay);
   },
@@ -487,5 +492,49 @@ Page({
   cleanupScene() {
     this.clearRoundTimers();
     this.clearGlobalTimer();
+    if (this.countdownInterval) clearInterval(this.countdownInterval);
+  },
+
+  togglePause() {
+    if (this.data.gameEnded || this.data.isCountingDown) return;
+
+    if (!this.data.isPaused) {
+      // Pause
+      this.clearRoundTimers();
+      this.clearGlobalTimer();
+      this.setData({ isPaused: true });
+    } else {
+      // Resume via countdown
+      this.startCountdown();
+    }
+  },
+
+  startCountdown() {
+    this.setData({
+      isPaused: false,
+      isCountingDown: true,
+      countdownText: "3"
+    });
+
+    let count = 3;
+    this.countdownInterval = setInterval(() => {
+      count--;
+      if (count > 0) {
+        this.setData({ countdownText: count.toString() });
+      } else if (count === 0) {
+        this.setData({ countdownText: "¡YA!" });
+      } else {
+        clearInterval(this.countdownInterval);
+        this.setData({ isCountingDown: false });
+        this.startGlobalTimer();
+        this.startExchange();
+      }
+    }, 1000);
+  },
+
+  exitGame() {
+    my.redirectTo({
+      url: '/tokaRPS/tokaRPS/pages/index/index'
+    });
   }
 });

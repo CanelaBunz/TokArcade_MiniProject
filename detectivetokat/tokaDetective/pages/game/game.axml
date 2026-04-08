@@ -6,6 +6,7 @@
     <view class="score">🎯 {{score}}</view>
     <view class="timer" style="color: {{timerColor}};">⏱ {{timerSeconds}}s</view>
     <view class="counter">{{counterText}}</view>
+    <view class="pause-btn" onTap="togglePause">⏸</view>
   </view>
 
   <view a:if="{{showLives}}" class="lives">{{livesText}}</view>
@@ -99,6 +100,15 @@
       <view class="tutorial-step">⏱ Tienes 30 segundos por pregunta.</view>
 
       <view class="confirm-btn" onTap="closeTutorial">¡Entendido!</view>
+    </view>
+  </view>
+
+  <!-- Pause Overlay -->
+  <view a:if="{{isPaused}}" class="overlay pause-overlay">
+    <view class="overlay-card">
+      <view class="overlay-title">Juego Pausado</view>
+      <view class="confirm-btn" onTap="resumeGame">Continuar</view>
+      <view class="confirm-btn exit-btn" onTap="exitGame">Salir</view>
     </view>
   </view>
 </view>
