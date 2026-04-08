@@ -3,42 +3,50 @@
 <view class="page-container">
   <top-bar puntos="{{puntos}}" />
 
-  <!-- Rack de premios -->
-  <view class="rack-container">
-
-    <!-- Techo de rayas rojas/blancas -->
-    <view class="techo">
-      <view
-        class="raya"
-        a:for="{{rayas}}"
-        a:key="index"
-        style="background-color: {{item.color}}"
-      ></view>
-    </view>
-
-    <!-- Estantes con premios -->
-    <view class="estantes">
-      <!-- Fila superior de premios -->
-      <view class="fila-premios">
-        <view class="premio-circle" a:for="{{[1,2,3]}}" a:key="*this"></view>
-      </view>
-      <!-- Divisor de estante -->
-      <view class="estante-divisor"></view>
-      <!-- Fila inferior de premios -->
-      <view class="fila-premios">
-        <view class="premio-circle" a:for="{{[1,2,3]}}" a:key="*this"></view>
+  <!-- Vista de selección de Marcas -->
+  <view class="brands-container" a:if="{{!showKiosco}}">
+    <view class="brands-grid">
+      <view class="brand-item" a:for="{{marcas}}" a:key="id" onTap="onTapMarca" data-id="{{item.id}}">
+        <view class="brand-circle" style="background-color: {{item.color}}">
+          <!-- Logo de la empresa (placeholder si no existe) -->
+          <image class="brand-logo" src="{{item.logo}}" mode="aspectFit" />
+        </view>
+        <text class="brand-name">{{item.nombre}}</text>
       </view>
     </view>
+  </view>
 
-    <!-- Letrero "Premios" -->
-    <view class="letrero-premios">
-      <view class="letrero-bg">
-        <view class="letrero-texto-bg">
-          <text class="letrero-texto">Premios</text>
+  <!-- Modal Kiosco (Tiendita) -->
+  <view class="modal-overlay {{showKiosco ? 'modal-active' : ''}}" a:if="{{showKiosco}}">
+    <view class="kiosco-card">
+      
+      <!-- Techo del Kiosco -->
+      <view class="kiosco-techo">
+        <view class="kiosco-raya" a:for="{{rayas}}" a:key="index" style="background-color: {{item.color}}"></view>
+      </view>
+
+      <view class="kiosco-content">
+        <view class="kiosco-header">
+          <text class="kiosco-nombre">{{selectedMarca.nombre}}</text>
+          <view class="btn-cerrar" onTap="onCloseKiosco">X</view>
+        </view>
+
+        <!-- Interior del Kiosco: Estantes -->
+        <view class="kiosco-interior">
+          <view class="kiosco-estante" a:for="{{[1,2]}}" a:key="*this">
+            <view class="kiosco-productos">
+               <view class="producto-placeholder" a:for="{{[1,2,3]}}" a:key="*this"></view>
+            </view>
+            <view class="kiosco-tabla"></view>
+          </view>
+        </view>
+
+        <view class="kiosco-footer">
+          <text class="kiosco-hint">Selecciona un producto para canjear</text>
         </view>
       </view>
+
     </view>
-
-
   </view>
+</view>
 </view>
