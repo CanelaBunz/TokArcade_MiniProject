@@ -66,6 +66,24 @@ export class TokatSaysGame {
     return Math.max(1200, 2500 - (round - 5) * 150);
   }
 
+  revive() {
+    this.state.playerIndex = 0;
+    // Generate a fresh sequence for the current round
+    this.state.sequence = [];
+    const availableGestures = this.state.round >= 5 ? this.gesturesWithTap : this.gestures;
+    for (let i = 0; i < this.state.round; i++) {
+      const newGesture = availableGestures[Math.floor(Math.random() * availableGestures.length)];
+      this.state.sequence.push(newGesture);
+    }
+    
+    return {
+      round: this.state.round,
+      sequence: this.state.sequence,
+      showSpeed: this.calculateSpeed(this.state.round),
+      timeLimit: this.calculateTimeLimit(this.state.round)
+    };
+  }
+
   getState() {
     return { ...this.state };
   }

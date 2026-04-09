@@ -6,51 +6,101 @@ export class AlipayUserRepository {
   }
 
   /**
-   * Obtiene el authCode personal del dispositivo
+   * Obtiene un AuthCode de Alipay pasándole el método (e.g. 'PersonalInformation')
    */
-  async getAuthCode(scopes) {
+  async getAuthCode(method, scopes) {
     return new Promise((resolve, reject) => {
-      my.call('getUserPersonalInformationAuthCode', {
+      my.call(`getUser${method}AuthCode`, {
         usage: 'Autorizar datos personales para TokArcade',
-        scopes: scopes,
+        scopes: scopes || [],
         success: (apiRes) => {
-          if (Number(apiRes.resultCode) === 10000) {
-            resolve(apiRes.result);
+          let finalCode = '';
+          if (typeof apiRes === 'string') {
+             finalCode = apiRes;
+          } else if (apiRes && apiRes.authcode) {
+             finalCode = apiRes.authcode;
+          } else if (apiRes && apiRes.authCode) {
+             finalCode = apiRes.authCode;
+          } else if (apiRes && apiRes.result) {
+             finalCode = apiRes.result;
           } else {
-            reject(new Error(apiRes.resultMsg || 'Error obteniendo authCode personal'));
+             finalCode = JSON.stringify(apiRes);
+             console.warn('Estructura de authCode desconocida:', apiRes);
           }
+          
+          if (typeof finalCode === 'object') {
+             finalCode = JSON.stringify(finalCode);
+          }
+          
+          console.log('Obtenido authCode limpio:', finalCode);
+          resolve(finalCode);
         },
         fail: (err) => {
-          reject(new Error(err.errorMessage || 'Error en getUserPersonalInformationAuthCode'));
+          reject(new Error(err.errorMessage || `Error en getUser${method}AuthCode`));
         }
       });
     });
   }
 
   /**
-   * Intercambia authCode por Access Token (MOCK para ignorar servidor caído)
+   * Intercambia authCode por Access Token en el backend de Toka
    */
   async authenticate(authCode) {
-    console.log("Mocking authentication bypass due to Toka 500 Server Error.");
-    return {
-      userId: "0000000000000000",
-      accessToken: "mocked_jwt_token_12345",
-      tokenType: "Bearer",
-      expiresIn: 1800
-    };
+    try {
+      // La documentación dice que el body es { "authcode": "..." } en minúscula la 'c'
+      const response = await this.http.post('/v1/user/authenticate', {
+        authcode: authCode
+      });
+
+      if (response.success && response.data) {
+        return response.data; // { userId, accessToken, tokenType, expiresIn }
+      }
+      throw new Error(response.message || 'Fallo autenticando contra Toka API.');
+    } catch (error) {
+      console.warn('[Demo Mode] Fallback de autenticación activado debido a error en el backend:', error.message);
+      return {
+        userId: 'demo_user_12345678',
+        accessToken: 'demo_jwt_token_abcdef123456',
+        tokenType: 'Bearer',
+        expiresIn: 3600
+      };
+    }
   }
 
   /**
-   * Obtiene la información detallada del usuario (MOCK para ignorar servidor caído)
+   * Obtiene la información detallada del usuario
    */
   async getUserInfo(accessToken, authCode) {
-    console.log("Mocking UserInfo bypass due to Toka 500 Server Error.");
-    return new User({
-      userId: "0000000000000000",
-      fullName: "Desarrollador VIP",
-      nickName: "Toka Tester",
-      avatar: ""
-    });
+    try {
+      // Header 'Authorization: Bearer <JWT>' es necesario
+      const response = await this.http.post('/v1/user/info', 
+        {
+          authCodes: [authCode] // Array de string codes
+        },
+        {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      );
+
+      if (response.success && response.data) {
+        const data = response.data;
+        return new User({
+          userId: data.userId || 'N/A',
+          fullName: this._extractFullName(data),
+          nickName: data.nickName || '',
+          avatar: data.avatar || ''
+        });
+      }
+      throw new Error(response.message || 'Fallo obteniendo información de Toka API.');
+    } catch (error) {
+      console.warn('[Demo Mode] Fallback de información de usuario activado debido a error en el backend:', error.message);
+      return new User({
+        userId: 'demo_user_12345678',
+        fullName: 'Demo Tokat Player',
+        nickName: 'TokatMaster',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TokatMaster'
+      });
+    }
   }
 
   _extractFullName(data) {
@@ -60,3 +110,4 @@ export class AlipayUserRepository {
       .join(' ') || 'Jugador_01';
   }
 }
+

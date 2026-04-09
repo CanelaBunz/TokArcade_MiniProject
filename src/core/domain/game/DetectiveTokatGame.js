@@ -46,6 +46,10 @@ export class DetectiveTokatGame {
      return false; // For infinite that automatically expands pool
   }
 
+  revive(lives = 1) {
+    this.state.lives = Math.max(this.state.lives, lives);
+  }
+
   getState() { 
     return { ...this.state }; 
   }

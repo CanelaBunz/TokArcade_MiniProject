@@ -79,6 +79,12 @@ export class TokaRpsGame {
       return this.state.progress >= this.maxProgress;
   }
 
+  revive(ms = 15000) {
+    this.state.remainingTime = Math.min(this.state.totalTime, this.state.remainingTime + ms);
+    this.state.drawStreakCount = 0;
+    return this.state.remainingTime;
+  }
+
   getState() { 
     return { ...this.state }; 
   }

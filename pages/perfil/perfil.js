@@ -65,6 +65,7 @@ Page({
       const authData = await authenticateUseCase.execute(app.globalData.personalInfoScopes);
       
       // Guardar tokens en globalData para persistencia durante la sesión
+      app.globalData.userId = authData.userId;
       app.globalData.accessToken = authData.accessToken;
       app.globalData.personalInfoAuthCode = authData.authCode;
 

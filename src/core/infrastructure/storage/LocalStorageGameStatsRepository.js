@@ -31,4 +31,14 @@ export class LocalStorageGameStatsRepository {
     const highScores = my.getStorageSync({ key: 'high_scores' }).data || {};
     return highScores[gameId] || 0;
   }
+
+  saveTransaction(transaction) {
+    const transactions = my.getStorageSync({ key: 'user_transactions' }).data || [];
+    transactions.push({
+      ...transaction,
+      timestamp: new Date().toISOString()
+    });
+    my.setStorageSync({ key: 'user_transactions', data: transactions });
+  }
 }
+

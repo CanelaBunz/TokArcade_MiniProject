@@ -5,8 +5,8 @@ export class AuthenticateUseCase {
 
   async execute(scopes) {
     try {
-      // 1. Obtener authCode del cliente
-      const authCode = await this.userRepository.getAuthCode(scopes);
+      // 1. Obtener authCode del cliente (por defecto usamos PersonalInformation o el que definan los scopes)
+      const authCode = await this.userRepository.getAuthCode('PersonalInformation', scopes);
       
       // 2. Intercambiar por token en el servidor
       const authData = await this.userRepository.authenticate(authCode);

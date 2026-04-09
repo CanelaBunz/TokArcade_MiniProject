@@ -1,9 +1,18 @@
 import { DetectiveTokatGame } from '../../../../src/core/domain/game/DetectiveTokatGame';
 import { LocalStorageGameStatsRepository } from '../../../../src/core/infrastructure/storage/LocalStorageGameStatsRepository';
 import { SaveGameStatsUseCase } from '../../../../src/core/application/game/SaveGameStatsUseCase';
+import { AlipayPaymentRepository } from '../../../../src/core/infrastructure/alipay/AlipayPaymentRepository';
+import { ProcessGamePaymentUseCase } from '../../../../src/core/application/game/ProcessGamePaymentUseCase';
+import { VerifyGamePaymentUseCase } from '../../../../src/core/application/game/VerifyGamePaymentUseCase';
+import { HttpClient } from '../../../../src/core/infrastructure/http/HttpClient';
 
 const statsRepository = new LocalStorageGameStatsRepository();
 const saveStatsUseCase = new SaveGameStatsUseCase(statsRepository);
+
+const httpClient = new HttpClient(getApp().globalData.apiBaseUrl, getApp().globalData.appId);
+const paymentRepository = new AlipayPaymentRepository(httpClient);
+const processPaymentUseCase = new ProcessGamePaymentUseCase(paymentRepository);
+const verifyPaymentUseCase = new VerifyGamePaymentUseCase(paymentRepository, statsRepository);
 
 const TIMER_SECONDS = 30;
 
@@ -123,7 +132,8 @@ Page({
     tutorialDone: false,
 
     isPaused: false,
-    gameEnded: false
+    gameEnded: false,
+    showContinueModal: false
   },
 
   onLoad(query) {
@@ -398,7 +408,7 @@ Page({
     });
 
     if (result.status === 'DEAD') {
-      this.resultDelay = setTimeout(() => this.endGame(), 1500);
+      this.resultDelay = setTimeout(() => this.showPayToContinue(), 1500);
       return;
     }
 
@@ -442,5 +452,90 @@ Page({
     my.redirectTo({
       url: `/pages/detective-tokat/pages/end/end?score=${score}&correct=${this.game.state.correctCount}&total=${total}&category=${this.data.category}&mode=${this.data.mode}&totalQuestions=${this.data.totalQuestions}`
     });
+  },
+
+  showPayToContinue() {
+    this.clearAllTimers();
+    this.setData({
+      showContinueModal: true,
+      phase: 'result',
+      feedbackText: '¿Llegaste al final?'
+    });
+  },
+
+  async onContinuePay() {
+    const app = getApp();
+    my.showLoading({ content: 'Procesando pago...' });
+    
+    try {
+      const response = await processPaymentUseCase.execute({
+        userId: app.globalData.userId,
+        accessToken: app.globalData.accessToken,
+        gameId: 'detective_tokat',
+        amount: 0.01
+      });
+
+      my.hideLoading();
+      
+      my.call('pay', {
+        paymentUrl: response.paymentUrl,
+        success: async (res) => {
+          my.showLoading({ content: 'Verificando pago...' });
+          
+          try {
+            const isVerified = await verifyPaymentUseCase.execute({
+              paymentId: response.paymentId,
+              accessToken: app.globalData.accessToken,
+              gameId: 'detective_tokat',
+              amount: 0.01
+            });
+
+            my.hideLoading();
+
+            if (isVerified) {
+              console.log('Pago verificado exitosamente');
+              this.reviveGame();
+            } else {
+              my.showToast({ content: 'El pago no se concretó' });
+            }
+          } catch (verifyError) {
+            my.hideLoading();
+            console.error('Error verificando pago', verifyError);
+            my.showToast({ content: 'Error verificando pago' });
+          }
+        },
+        fail: (err) => {
+          console.error('Error en pago', err);
+          my.showToast({ content: 'Pago cancelado o fallido' });
+        }
+      });
+    } catch (error) {
+      my.hideLoading();
+      console.warn('[Demo Mode] Pago simulado - servidor no disponible:', error.message);
+      my.showToast({ content: '¡Vida extra gratis! (Demo)' });
+      this.reviveGame();
+    }
+  },
+
+  onCancelContinue() {
+    this.setData({ showContinueModal: false });
+    this.endGame();
+  },
+
+  reviveGame() {
+    this.game.revive(1); // 1 vida extra
+    
+    this.setData({
+      showContinueModal: false,
+      gameEnded: false,
+      livesText: this.getLivesText(this.game.state.lives),
+      feedbackText: '¡RESTAURADO! +1 Vida',
+      feedbackColor: '#10B981'
+    });
+
+    this.resultDelay = setTimeout(() => {
+      this.startWalk();
+    }, 1500);
   }
+
 });

@@ -1,9 +1,18 @@
 import { TokatSaysGame } from '../../../../src/core/domain/game/TokatSaysGame';
 import { LocalStorageGameStatsRepository } from '../../../../src/core/infrastructure/storage/LocalStorageGameStatsRepository';
 import { SaveGameStatsUseCase } from '../../../../src/core/application/game/SaveGameStatsUseCase';
+import { AlipayPaymentRepository } from '../../../../src/core/infrastructure/alipay/AlipayPaymentRepository';
+import { ProcessGamePaymentUseCase } from '../../../../src/core/application/game/ProcessGamePaymentUseCase';
+import { VerifyGamePaymentUseCase } from '../../../../src/core/application/game/VerifyGamePaymentUseCase';
+import { HttpClient } from '../../../../src/core/infrastructure/http/HttpClient';
 
 const statsRepository = new LocalStorageGameStatsRepository();
 const saveStatsUseCase = new SaveGameStatsUseCase(statsRepository);
+
+const httpClient = new HttpClient(getApp().globalData.apiBaseUrl, getApp().globalData.appId);
+const paymentRepository = new AlipayPaymentRepository(httpClient);
+const processPaymentUseCase = new ProcessGamePaymentUseCase(paymentRepository);
+const verifyPaymentUseCase = new VerifyGamePaymentUseCase(paymentRepository, statsRepository);
 
 const BASE = '/images/tokat/';
 
@@ -56,7 +65,8 @@ Page({
 
     isPaused: false,
     isCountingDown: false,
-    countdownText: ''
+    countdownText: '',
+    showContinueModal: false
   },
 
   onLoad() {
@@ -336,7 +346,7 @@ Page({
 
     this.gestureTimerTimeout = setTimeout(() => {
       if (this.data.gameOver || !this.data.isPlayerTurn || this.data.isPaused || this.data.isCountingDown) return;
-      this.endGame();
+      this.showPayToContinue();
     }, total);
   },
 
@@ -360,7 +370,7 @@ Page({
     const result = this.game.handlePlayerInput(gesture);
 
     if (result.status === 'WRONG') {
-      this.endGame();
+      this.showPayToContinue();
       return;
     }
 
@@ -430,6 +440,98 @@ Page({
         });
       }, 700);
     });
+  },
+
+  showPayToContinue() {
+    this.cleanupTimers();
+    this.setData({
+      showContinueModal: true,
+      isPlayerTurn: false,
+      showTimer: false
+    });
+  },
+
+  async onContinuePay() {
+    const app = getApp();
+    my.showLoading({ content: 'Procesando pago...' });
+    
+    try {
+      const response = await processPaymentUseCase.execute({
+        userId: app.globalData.userId,
+        accessToken: app.globalData.accessToken,
+        gameId: 'tokat_says',
+        amount: 0.01
+      });
+
+      my.hideLoading();
+      
+      my.call('pay', {
+        paymentUrl: response.paymentUrl,
+        success: async (res) => {
+          my.showLoading({ content: 'Verificando pago...' });
+          
+          try {
+            const isVerified = await verifyPaymentUseCase.execute({
+              paymentId: response.paymentId,
+              accessToken: app.globalData.accessToken,
+              gameId: 'tokat_says',
+              amount: 0.01
+            });
+
+            my.hideLoading();
+
+            if (isVerified) {
+              console.log('Pago verificado exitosamente');
+              this.reviveGame();
+            } else {
+              my.showToast({ content: 'El pago no se concretó' });
+            }
+          } catch (verifyError) {
+            my.hideLoading();
+            console.error('Error verificando pago', verifyError);
+            my.showToast({ content: 'Error verificando pago' });
+          }
+        },
+        fail: (err) => {
+          console.error('Error en pago', err);
+          my.showToast({ content: 'Pago cancelado o fallido' });
+        }
+      });
+    } catch (error) {
+      my.hideLoading();
+      console.warn('[Demo Mode] Pago simulado - servidor no disponible:', error.message);
+      my.showToast({ content: '¡Vida extra gratis! (Demo)' });
+      this.reviveGame();
+    }
+  },
+
+  onCancelContinue() {
+    this.setData({ showContinueModal: false });
+    this.endGame();
+  },
+
+  reviveGame() {
+    const roundData = this.game.revive();
+    
+    this.setData({
+      showContinueModal: false,
+      gameOver: false,
+      round: roundData.round,
+      sequenceLength: roundData.sequence.length,
+      isShowingSequence: true,
+      isPlayerTurn: false,
+      showTimer: false,
+      statusText: '¡Revivido! Tokat genera nueva secuencia...',
+      statusColor: '#38BDF8',
+      tokatBorderColor: '#38BDF8'
+    });
+
+    this.setButtonsEnabled(false);
+    this._setNeutral();
+
+    this.nextRoundTimeout = setTimeout(() => {
+      this.showSequence(roundData.sequence, roundData.showSpeed);
+    }, 1500);
   },
 
   setButtonsEnabled(enabled) {

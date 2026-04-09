@@ -112,7 +112,31 @@
       </view>
 
       <text class="tutorial-note">Consejo: el juego empieza más calmado y luego acelera poco a poco. No te adelantes; espera el momento de ¡TIJERAS!</text>
-      <toka-button variant="primary" onClick="beginFromTutorial" fullWidth>Entendido</toka-button>
+
+      <view class="tutorial-start-btn" onTap="beginFromTutorial">
+        <text class="tutorial-start-text">¡ENTENDIDO, A JUGAR!</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Pay to Continue Modal -->
+  <view a:if="{{showContinueModal}}" class="modal-overlay">
+    <view class="modal-card">
+      <view class="modal-header">
+        <text class="modal-title">¿QUIERES CONTINUAR?</text>
+        <view class="price-badge">$0.01 MXN</view>
+      </view>
+      <text class="modal-desc">¡No te rindas! Paga un centavo para obtener 15 segundos extra de tiempo y seguir luchando contra Tokat.</text>
+      
+      <view class="modal-actions">
+        <toka-button variant="primary" onClick="onContinuePay" fullWidth className="modal-spacing">
+          PAGAR Y CONTINUAR
+        </toka-button>
+        <toka-button variant="outline" onClick="onCancelContinue" fullWidth>
+          No, terminar juego
+        </toka-button>
+      </view>
     </view>
   </view>
 </view>
+

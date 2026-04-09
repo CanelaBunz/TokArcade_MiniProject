@@ -16,7 +16,7 @@
 
 .pause-button-top {
   position: absolute;
-  top: 24rpx;
+  top: 160rpx;
   right: 32rpx;
   width: 80rpx;
   height: 80rpx;
@@ -190,13 +190,42 @@
   box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.5);
 }
 
+.modal-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40rpx;
+}
+
 .modal-title {
   color: #ffffff;
-  font-size: 40rpx;
+  font-size: 36rpx;
   font-weight: 800;
-  margin-bottom: 60rpx;
   text-align: center;
   letter-spacing: 2rpx;
+  margin-bottom: 20rpx;
+}
+
+.price-badge {
+  background: #e94560;
+  color: #ffffff;
+  font-size: 24rpx;
+  font-weight: bold;
+  padding: 8rpx 24rpx;
+  border-radius: 100rpx;
+  box-shadow: 0 4rpx 12rpx rgba(233, 69, 96, 0.4);
+}
+
+.modal-desc {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 26rpx;
+  line-height: 1.6;
+  text-align: center;
+  margin-bottom: 60rpx;
+}
+
+.modal-actions {
+  width: 100%;
 }
 
 .modal-spacing {

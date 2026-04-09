@@ -62,4 +62,24 @@
   <view a:if="{{isCountingDown}}" class="modal-overlay countdown-overlay">
     <text class="countdown-number">{{countdownText}}</text>
   </view>
+
+  <!-- Pay to Continue Modal -->
+  <view a:if="{{showContinueModal}}" class="modal-overlay">
+    <view class="modal-card">
+      <view class="modal-header">
+        <text class="modal-title">¿QUIERES CONTINUAR?</text>
+        <view class="price-badge">$0.01 MXN</view>
+      </view>
+      <text class="modal-desc">No detengas tu racha. Paga un centavo para generar una nueva secuencia en esta misma ronda y seguir sumando tokens.</text>
+      
+      <view class="modal-actions">
+        <toka-button variant="primary" onClick="onContinuePay" fullWidth className="modal-spacing">
+          PAGAR Y CONTINUAR
+        </toka-button>
+        <toka-button variant="outline" onClick="onCancelContinue" fullWidth>
+          No, terminar juego
+        </toka-button>
+      </view>
+    </view>
+  </view>
 </view>

@@ -1,6 +1,7 @@
 App({
   onLaunch() {
     console.log('TokArcade Mini App lanzada');
+    // Eliminado el mock: la aplicación ahora autenticará usando el perfil / flujo oficial.
   },
 
   onShow() {

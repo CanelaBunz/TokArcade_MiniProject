@@ -61,13 +61,13 @@ Page({
 
   retryGame() {
     my.redirectTo({
-      url: `/detectivetokat/pages/game/game?category=${this.data.category}&mode=infinite&totalQuestions=-1`
+      url: `/pages/detective-tokat/pages/game/game?category=${this.data.category}&mode=infinite&totalQuestions=-1`
     });
   },
 
   goMenu() {
     my.redirectTo({
-      url: `/detectivetokat/pages/index/index`
+      url: `/pages/detective-tokat/pages/index/index`
     });
   }
 });
