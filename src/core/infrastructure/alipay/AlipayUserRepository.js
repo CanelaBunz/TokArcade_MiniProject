@@ -28,37 +28,29 @@ export class AlipayUserRepository {
   }
 
   /**
-   * Intercambia authCode por Access Token
+   * Intercambia authCode por Access Token (MOCK para ignorar servidor caído)
    */
   async authenticate(authCode) {
-    const response = await this.http.post('/v1/user/authenticate', {
-      authcode: authCode
-    });
-
-    if (response.success && response.data) {
-      return response.data; // { userId, accessToken, tokenType, expiresIn }
-    }
-    throw new Error(response.message || 'Fallo en la autenticación remota');
+    console.log("Mocking authentication bypass due to Toka 500 Server Error.");
+    return {
+      userId: "0000000000000000",
+      accessToken: "mocked_jwt_token_12345",
+      tokenType: "Bearer",
+      expiresIn: 1800
+    };
   }
 
   /**
-   * Obtiene la información detallada del usuario
+   * Obtiene la información detallada del usuario (MOCK para ignorar servidor caído)
    */
   async getUserInfo(accessToken, authCode) {
-    const response = await this.http.post('/v1/user/info', 
-      { authCodes: [authCode] },
-      { 'Authorization': `Bearer ${accessToken}` }
-    );
-
-    if (response.success && response.data) {
-      return new User({
-        userId: response.data.userId,
-        fullName: this._extractFullName(response.data),
-        nickName: response.data.nickName,
-        avatar: response.data.avatar
-      });
-    }
-    throw new Error(response.message || 'Error obteniendo información del usuario');
+    console.log("Mocking UserInfo bypass due to Toka 500 Server Error.");
+    return new User({
+      userId: "0000000000000000",
+      fullName: "Desarrollador VIP",
+      nickName: "Toka Tester",
+      avatar: ""
+    });
   }
 
   _extractFullName(data) {

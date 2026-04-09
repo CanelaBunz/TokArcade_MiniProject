@@ -1,0 +1,34 @@
+# Archivos de entorno y logs
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Carpetas de Alipay Mini Programs IDE
+.mini-ide/
+*.swan/
+.sourcemaps/
+dist/
+dist-*/
+
+# Agentes e IA (Trae, Claude, Junie)
+.agents/
+.claude/
+.junie/
+.trae/
+skills-lock.json
+
+# Archivos de Sistema 
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+
+# Archivos propios del IDE (VSCode, IntelliJ, etc)
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Artefactos y reportes IA
+**/*.md
+brain/

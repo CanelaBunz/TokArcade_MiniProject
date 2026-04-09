@@ -10,7 +10,7 @@ Page({
   },
   startGame() {
     my.redirectTo({
-      url: '/pages/tokat-says/tokaRhytm/pages/game/game'
+      url: '/pages/tokat-says/pages/game/game'
     });
   }
 });

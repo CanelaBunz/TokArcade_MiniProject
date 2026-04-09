@@ -28,20 +28,20 @@
       {
         "pagePath": "pages/tienda/tienda",
         "name": "Tienda",
-        "icon": "/images/icon_tienda.png",
-        "activeIcon": "/images/icon_tienda_active.png"
+        "icon": "images/icon_tienda.png",
+        "activeIcon": "images/icon_tienda_active.png"
       },
       {
         "pagePath": "pages/menu/menu",
         "name": "Inicio",
-        "icon": "/images/icon_home.png",
-        "activeIcon": "/images/icon_home_active.png"
+        "icon": "images/icon_home.png",
+        "activeIcon": "images/icon_home_active.png"
       },
       {
         "pagePath": "pages/perfil/perfil",
         "name": "Perfil",
-        "icon": "/images/icon_perfil.png",
-        "activeIcon": "/images/icon_perfil_active.png"
+        "icon": "images/icon_perfil.png",
+        "activeIcon": "images/icon_perfil_active.png"
       }
     ]
   }

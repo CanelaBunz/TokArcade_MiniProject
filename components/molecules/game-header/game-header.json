@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "toka-progress": "../../atoms/toka-progress/toka-progress"
+  }
+}

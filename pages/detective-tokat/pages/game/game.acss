@@ -1,300 +1,308 @@
 .page {
   min-height: 100vh;
-  /* Gradiente alineado con shell: #1a1a2e como base */
-  background: linear-gradient(180deg, #0d1020, #1a1a2e);
-  padding: 24rpx 20rpx 36rpx;
+  background-color: #1a1a2e;
+  padding: 0;
   box-sizing: border-box;
   position: relative;
   overflow: hidden;
 }
 
-.bg-glow {
-  position: absolute;
-  border-radius: 999rpx;
-  opacity: 0.14;
+.game-content {
+  padding: 24rpx 32rpx;
+  display: flex;
+  flex-direction: column;
 }
 
-.hud {
+.pause-button-top {
+  position: absolute;
+  top: 24rpx;
+  right: 32rpx;
+  width: 80rpx;
+  height: 80rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-size: 32rpx;
+  border-radius: 50%;
+  backdrop-filter: blur(5px);
+  z-index: 100;
+}
+
+.sub-hud {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: relative;
-  z-index: 2;
+  margin-top: 10rpx;
 }
 
-.score { font-size: 28rpx; color: #c4b5fd; }
-.timer { font-size: 28rpx; color: #9ca3af; }
-.counter { font-size: 26rpx; color: #9ca3af; }
+.counter {
+  color: #38bdf8;
+  font-weight: 800;
+  font-size: 32rpx;
+}
 
 .lives {
-  margin-top: 14rpx;
-  text-align: center;
-  color: #ffffff;
-  font-size: 28rpx;
+  font-size: 36rpx;
+  letter-spacing: 4rpx;
 }
 
 .category-badge {
-  margin-top: 18rpx;
-  text-align: center;
-  font-size: 30rpx;
-  color: #8b5cf6;
-}
-
-.mode-badge {
-  margin-top: 8rpx;
-  text-align: center;
+  margin: 20rpx auto;
+  padding: 8rpx 24rpx;
+  background: rgba(233, 69, 96, 0.1);
+  border: 2rpx solid #e94560;
+  color: #e94560;
+  border-radius: 100rpx;
   font-size: 22rpx;
-  color: #4b5563;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .scene-card {
-  margin-top: 30rpx;
-  min-height: 860rpx;
-  background: rgba(26, 23, 48, 0.95);
-  border: 4rpx solid rgba(124, 58, 237, 0.45);
-  border-radius: 28rpx;
-  padding: 30rpx 24rpx;
+  width: 100%;
+  background: #16213e;
+  border-radius: 40rpx;
+  padding: 32rpx;
   box-sizing: border-box;
-  position: relative;
-  z-index: 2;
+  min-height: 600rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.05);
 }
 
-.walk-phase, .result-phase {
-  min-height: 780rpx;
+.walk-phase {
+  height: 400rpx;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 32rpx;
 }
 
-.walk-icon { font-size: 88rpx; }
+.walk-icon {
+  font-size: 120rpx;
+  animation: walkAnim 1s infinite alternate ease-in-out;
+}
+
+@keyframes walkAnim {
+  0% { transform: translateY(0) rotate(-5deg); }
+  100% { transform: translateY(-20rpx) rotate(5deg); }
+}
+
 .walk-title {
-  margin-top: 24rpx;
-  font-size: 34rpx;
-  color: #c4b5fd;
-  text-align: center;
-  font-weight: bold;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 28rpx;
+  font-weight: 600;
 }
 
-/* Question Phase - Scratchable Mystery Box */
 .question-phase {
-  min-height: 780rpx;
-  display: flex;
-  flex-direction: column;
-}
-
-.paper-area {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 8rpx;
 }
 
-.paper-icon { font-size: 72rpx; }
+.paper-area {
+  margin-bottom: 24rpx;
+  text-align: center;
+}
+
+.paper-icon {
+  font-size: 80rpx;
+  cursor: pointer;
+}
+
+.pulse {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); filter: drop-shadow(0 0 10rpx #e94560); }
+  100% { transform: scale(1); }
+}
+
 .paper-hint {
-  margin-top: 10rpx;
-  font-size: 22rpx;
-  color: #6b7280;
+  font-size: 20rpx;
+  color: #e94560;
+  font-weight: bold;
+  margin-top: 8rpx;
+  text-transform: uppercase;
 }
 
 .scratch-box {
-  margin-top: 36rpx;
-  position: relative;
   width: 100%;
-  min-height: 400rpx;
-  border-radius: 24rpx;
+  height: 400rpx;
+  background: #0f172a;
+  border-radius: 20rpx;
+  position: relative;
   overflow: hidden;
-  background: #111;
-  border: 6rpx solid #3e2723;
-  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.8);
+  border: 4rpx solid #1e293b;
 }
 
 .question-layer {
   position: absolute;
-  inset: 0;
-  background: #fdf6e3;
-  padding: 40rpx 30rpx;
-  box-sizing: border-box;
+  top: 0; left: 0; right: 0; bottom: 0;
+  padding: 40rpx;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .question-title {
-  font-size: 26rpx;
-  color: #7c3aed;
+  font-size: 22rpx;
+  color: #64748b;
   font-weight: bold;
+  margin-bottom: 16rpx;
   text-transform: uppercase;
-  letter-spacing: 2rpx;
-  margin-bottom: 24rpx;
-  text-align: center;
 }
 
 .question-text {
+  color: #ffffff;
   font-size: 34rpx;
-  line-height: 1.6;
-  color: #111;
-  font-weight: bold;
-  text-align: center;
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 .darkness-layer {
   position: absolute;
-  inset: 0;
-  background: #0d0b1a; /* Very dark blue-black */
-  z-index: 5;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #020617;
   display: flex;
   justify-content: center;
   align-items: center;
-  pointer-events: none; /* Touches pass through to #scratchContainer */
-
-  /* The magic bit: cutout hole */
-  /* We use radial-gradient as mask. Transparent in the middle, black elsewhere */
-  /* Since it's CSS, we'll try standard mask-image */
+  pointer-events: none;
 }
 
 .darkness-pattern {
-  font-size: 160rpx;
-  color: rgba(124, 58, 237, 0.1);
-  font-weight: bold;
+  font-size: 150rpx;
+  color: rgba(255, 255, 255, 0.03);
+  font-weight: 900;
 }
 
 .floating-torch {
   position: absolute;
   width: 100rpx;
   height: 100rpx;
+  margin-left: -50rpx;
+  margin-top: -50rpx;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 72rpx;
-  z-index: 10;
+  font-size: 50rpx;
   pointer-events: none;
-  transform: translate(-50%, -50%);
-  filter: drop-shadow(0 0 15rpx rgba(255, 255, 255, 0.4));
+  z-index: 10;
 }
 
 .torch-glow {
   position: absolute;
-  width: 150rpx;
-  height: 150rpx;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, transparent 70%);
+  width: 250rpx;
+  height: 250rpx;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
   border-radius: 50%;
-  pointer-events: none;
-  transform: translate(0, -30rpx); /* Slightly offset upward to match beam direction */
 }
 
 .tools {
-  margin-top: auto;
+  margin-top: 32rpx;
   display: flex;
   flex-direction: column;
-  gap: 18rpx;
+  align-items: center;
+  gap: 20rpx;
 }
 
 .tool-instruction {
-  font-size: 26rpx;
-  color: #94a3b8;
-  text-align: center;
-  padding: 10rpx 0;
-  font-style: italic;
+  font-size: 24rpx;
+  color: #64748b;
 }
 
-.tool.lens {
-  height: 96rpx;
-  border-radius: 20rpx;
+.lens {
+  padding: 16rpx 40rpx;
+  background: #1e293b;
+  border-radius: 100rpx;
+  color: white;
+  font-weight: bold;
+  font-size: 28rpx;
+  border: 2rpx solid #334155;
+}
+
+.lens.active {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38bdf8;
+  color: #38bdf8;
+  box-shadow: 0 0 20rpx rgba(56, 189, 248, 0.2);
+}
+
+.result-phase {
+  height: 400rpx;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 30rpx;
-  font-weight: bold;
-  background: #1e1b2f;
-  color: #c4b5fd;
-  border: 3rpx solid #7c3aed;
-}
-
-.tool.active {
-  background: rgba(124, 58, 237, 0.2);
-  box-shadow: 0 0 20rpx rgba(124, 58, 237, 0.5);
 }
 
 .feedback {
-  font-size: 42rpx;
-  font-weight: bold;
+  font-size: 48rpx;
+  font-weight: 800;
   text-align: center;
 }
 
-.overlay {
+/* Modal and Grid */
+.modal-overlay {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.82);
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(26, 26, 46, 0.98);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 24rpx;
-  box-sizing: border-box;
-  z-index: 100;
+  z-index: 2000;
 }
 
-.overlay-card {
-  width: 100%;
-  background: #1a1730;
-  border: 4rpx solid #7c3aed;
-  border-radius: 24rpx;
-  padding: 30rpx 24rpx;
-  box-sizing: border-box;
+.modal-card {
+  width: 85%;
+  background: #16213e;
+  border-radius: 40rpx;
+  padding: 60rpx 40rpx;
+  display: flex;
+  flex-direction: column;
 }
 
-.overlay-title {
-  font-size: 38rpx;
-  color: #e2e8f0;
-  font-weight: bold;
+.modal-title {
+  color: #ffffff;
+  font-size: 36rpx;
+  font-weight: 800;
+  margin-bottom: 40rpx;
   text-align: center;
-  margin-bottom: 24rpx;
 }
 
-.tutorial-step {
-  font-size: 28rpx;
-  color: #c4b5fd;
-  margin-top: 16rpx;
-  text-align: center;
-  line-height: 1.5;
+.options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  margin-bottom: 40rpx;
 }
 
 .opt {
-  background: #2d2550;
-  border: 3rpx solid rgba(124, 58, 237, 0.45);
-  border-radius: 16rpx;
-  padding: 20rpx;
-  margin-top: 16rpx;
-  font-size: 30rpx;
-  color: #e2e8f0;
-  text-align: center;
+  padding: 24rpx 32rpx;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20rpx;
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 600;
+  border: 2rpx solid transparent;
+  transition: all 0.2s;
 }
 
 .opt.selected {
-  background: #7c3aed;
-  border-color: #a78bfa;
-  font-weight: bold;
+  background: rgba(233, 69, 96, 0.15);
+  border-color: #e94560;
+  color: #e94560;
 }
 
-.confirm-btn {
-  margin: 28rpx auto 0;
-  width: 260rpx;
-  height: 82rpx;
-  border-radius: 18rpx;
-  background: #7c3aed;
-  color: #ffffff;
-  font-size: 30rpx;
-  font-weight: bold;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.tutorial-step {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 24rpx;
+  margin-bottom: 24rpx;
+  line-height: 1.6;
 }
 
-.pause-btn {
-  font-size: 32rpx;
-  color: #ffffff;
-  padding: 10rpx 40rpx;
-  background: rgba(124, 58, 237, 0.3);
-  border: 2rpx solid #7c3aed;
-  border-radius: 12rpx;
+.modal-spacing {
+  margin-bottom: 24rpx;
 }

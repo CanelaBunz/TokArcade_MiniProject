@@ -10,6 +10,14 @@
     "**/.DS_Store",
     "**/.git/**",
     ".agents/**",
+    ".claude/**",
+    ".junie/**",
+    ".trae/**",
+    "skills-lock.json",
+    ".gitignore",
+    "pages/prejuego/**",
+    "custom-tab-bar/**",
+    "src/core/domain/game/GameSession.js",
     "**/*.md"
   ]
 }

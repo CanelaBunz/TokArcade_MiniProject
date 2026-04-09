@@ -63,7 +63,7 @@
     <view class="info-card">
       <view class="info-header">{{selectedCupon.tipo}}</view>
       <text class="info-desc">{{selectedCupon.desc}}</text>
-      <view class="btn-cerrar-info" onTap="onCloseCuponInfo">Cerrar</view>
+      <toka-button variant="outline" onClick="onCloseCuponInfo" fullWidth>Cerrar</toka-button>
     </view>
   </view>
 
@@ -82,7 +82,7 @@
       </scroll-view>
       <view class="cart-footer">
         <text class="cart-total">Total: {{cartTotal}} pts</text>
-        <view class="btn-checkout" onTap="onCheckout">Canjear Todo</view>
+        <toka-button variant="primary" onClick="onCheckout" fullWidth>Canjear Todo</toka-button>
       </view>
     </view>
   </view>

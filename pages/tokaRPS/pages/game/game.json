@@ -1,3 +1,6 @@
 {
-  "defaultTitle": "Toka RPS"
+  "usingComponents": {
+    "game-header": "../../../../components/molecules/game-header/game-header",
+    "toka-button": "../../../../components/atoms/toka-button/toka-button"
+  }
 }

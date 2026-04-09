@@ -1,3 +1,10 @@
+import { DetectiveTokatGame } from '../../../../src/core/domain/game/DetectiveTokatGame';
+import { LocalStorageGameStatsRepository } from '../../../../src/core/infrastructure/storage/LocalStorageGameStatsRepository';
+import { SaveGameStatsUseCase } from '../../../../src/core/application/game/SaveGameStatsUseCase';
+
+const statsRepository = new LocalStorageGameStatsRepository();
+const saveStatsUseCase = new SaveGameStatsUseCase(statsRepository);
+
 const TIMER_SECONDS = 30;
 
 const CATEGORY_LABELS = {
@@ -87,10 +94,7 @@ Page({
     modeLabel: '',
 
     questionPool: [],
-    currentIndex: 0,
     score: 0,
-    correctCount: 0,
-    lives: 3,
     showLives: false,
     livesText: '',
 
@@ -129,7 +133,8 @@ Page({
 
     const pool = this.buildQuestionPool(category, totalQuestions);
     const showLives = mode === 'infinite';
-    const lives = showLives ? 3 : 0;
+
+    this.game = new DetectiveTokatGame(category, totalQuestions, mode);
 
     this.setData({
       category,
@@ -139,8 +144,7 @@ Page({
       modeLabel: MODE_LABELS[mode] || mode,
       questionPool: pool,
       showLives,
-      lives,
-      livesText: this.getLivesText(lives),
+      livesText: this.getLivesText(this.game.state.lives),
       counterText: this.getCounterText(0, totalQuestions),
       showTutorial: false,
       tutorialDone: true
@@ -151,9 +155,8 @@ Page({
     this.timerInterval = null;
     this.timerTimeout = null;
     this.resultDelay = null;
-    this.rect = null; // Store measurement
+    this.rect = null; 
 
-    // Auto-start game
     this.startWalk();
   },
 
@@ -163,14 +166,12 @@ Page({
 
   buildQuestionPool(category, totalQuestions) {
     let pool = shuffleArray(QUESTIONS[category] || []);
-
     if (totalQuestions > 0) {
       while (pool.length < totalQuestions) {
         pool = pool.concat(shuffleArray(QUESTIONS[category] || []));
       }
       pool = pool.slice(0, totalQuestions);
     }
-
     return pool;
   },
 
@@ -213,7 +214,7 @@ Page({
   startQuestionPhase() {
     if (this.data.gameEnded) return;
 
-    const q = this.data.questionPool[this.data.currentIndex];
+    const q = this.data.questionPool[this.game.state.currentIndex];
     if (!q) {
       this.endGame();
       return;
@@ -233,10 +234,9 @@ Page({
       paperPulse: true,
       timerSeconds: TIMER_SECONDS,
       timerColor: '#9ca3af',
-      counterText: this.getCounterText(this.data.currentIndex, this.data.totalQuestions)
+      counterText: this.getCounterText(this.game.state.currentIndex, this.data.totalQuestions)
     });
 
-    // Capture the container size/pos to fix coordinate mapping
     this.measureContainer();
 
     this.remainingMs = TIMER_SECONDS * 1000;
@@ -250,7 +250,6 @@ Page({
       .exec((res) => {
         if (res && res[0]) {
           this.rect = res[0];
-          // Default torch to center
           this.setData({
             torchX: this.rect.width / 2,
             torchY: this.rect.height / 2
@@ -286,17 +285,11 @@ Page({
 
   togglePause() {
     if (this.data.gameEnded || this.data.showTutorial) return;
-
-    const nextPaused = !this.data.isPaused;
-    this.setData({
-      isPaused: nextPaused
-    });
+    this.setData({ isPaused: !this.data.isPaused });
   },
 
   resumeGame() {
-    this.setData({
-      isPaused: false
-    });
+    this.setData({ isPaused: false });
   },
 
   exitGame() {
@@ -306,29 +299,18 @@ Page({
   },
 
   clearQuestionTimers() {
-    if (this.timerInterval) {
-      clearInterval(this.timerInterval);
-      this.timerInterval = null;
-    }
-
-    if (this.timerTimeout) {
-      clearTimeout(this.timerTimeout);
-      this.timerTimeout = null;
-    }
-
-    if (this.resultDelay) {
-      clearTimeout(this.resultDelay);
-      this.resultDelay = null;
-    }
+    if (this.timerInterval) clearInterval(this.timerInterval);
+    if (this.timerTimeout) clearTimeout(this.timerTimeout);
+    if (this.resultDelay) clearTimeout(this.resultDelay);
+    this.timerInterval = null;
+    this.timerTimeout = null;
+    this.resultDelay = null;
   },
 
   clearAllTimers() {
     this.clearQuestionTimers();
-
-    if (this.walkTimer) {
-      clearTimeout(this.walkTimer);
-      this.walkTimer = null;
-    }
+    if (this.walkTimer) clearTimeout(this.walkTimer);
+    this.walkTimer = null;
   },
 
   onTorchStart(e) {
@@ -342,15 +324,10 @@ Page({
     if (!e.touches || !e.touches[0] || !this.rect) return;
 
     const touch = e.touches[0];
-    
-    // Calculate ELEMENT-RELATIVE coordinates
     const x = touch.clientX - this.rect.left;
     const y = touch.clientY - this.rect.top;
 
-    this.setData({
-      torchX: x,
-      torchY: y
-    });
+    this.setData({ torchX: x, torchY: y });
   },
 
   onTorchEnd() {
@@ -359,10 +336,7 @@ Page({
 
   toggleLens() {
     if (this.data.phase !== 'question' || this.data.isPaused) return;
-
-    this.setData({
-      lensActive: !this.data.lensActive
-    });
+    this.setData({ lensActive: !this.data.lensActive });
   },
 
   tapPaper() {
@@ -377,10 +351,7 @@ Page({
 
   selectOption(e) {
     const index = Number(e.currentTarget.dataset.index);
-
-    this.setData({
-      selectedOption: index
-    });
+    this.setData({ selectedOption: index });
   },
 
   confirmAnswer() {
@@ -390,134 +361,86 @@ Page({
     this.clearQuestionTimers();
 
     const isCorrect = this.data.selectedOption === this.data.currentCorrectIndex;
-
-    if (isCorrect) {
-      this.setData({
-        phase: 'result',
-        showOptionsOverlay: false,
-        paperPulse: false,
-        score: this.data.score + 10,
-        correctCount: this.data.correctCount + 1,
-        feedbackText: '¡Correcto! 🎉',
-        feedbackColor: '#10b981'
-      });
-    } else {
-      if (this.data.mode === 'infinite') {
-        const nextLives = Math.max(0, this.data.lives - 1);
-
-        this.setData({
-          lives: nextLives,
-          livesText: this.getLivesText(nextLives)
-        });
-
-        if (nextLives <= 0) {
-          this.setData({
-            phase: 'result',
-            showOptionsOverlay: false,
-            paperPulse: false,
-            feedbackText: 'Incorrecto 💔',
-            feedbackColor: '#ef4444'
-          });
-
-          this.resultDelay = setTimeout(() => {
-            this.endGame();
-          }, 1500);
-          return;
-        }
-      }
-
-      this.setData({
-        phase: 'result',
-        showOptionsOverlay: false,
-        paperPulse: false,
-        feedbackText: 'Incorrecto 💔',
-        feedbackColor: '#ef4444'
-      });
-    }
-
-    this.resultDelay = setTimeout(() => {
-      this.advanceOrEnd();
-    }, 1500);
+    const result = this.game.evaluateAnswer(isCorrect);
+    this.processResult(result);
   },
 
   handleTimeExpired() {
     this.clearQuestionTimers();
-
     if (this.data.phase !== 'question') return;
 
-    if (this.data.mode === 'infinite') {
-      const nextLives = Math.max(0, this.data.lives - 1);
+    const result = this.game.handleTimeExpired();
+    this.processResult(result);
+  },
 
-      this.setData({
-        lives: nextLives,
-        livesText: this.getLivesText(nextLives)
-      });
+  processResult(result) {
+    let text = '';
+    let color = '';
 
-      if (nextLives <= 0) {
-        this.setData({
-          phase: 'result',
-          showOptionsOverlay: false,
-          paperPulse: false,
-          feedbackText: '⏰ ¡Sin tiempo! 💔',
-          feedbackColor: '#ef4444',
-          timerSeconds: 0
-        });
-
-        this.resultDelay = setTimeout(() => {
-          this.endGame();
-        }, 1500);
-        return;
-      }
+    if (result.status === 'CORRECT') {
+       text = '¡Correcto! 🎉'; color = '#10b981';
+    } else if (result.status === 'WRONG_ALIVE' || result.status === 'WRONG') {
+       text = 'Incorrecto 💔'; color = '#ef4444';
+    } else if (result.status === 'EXPIRED_ALIVE' || result.status === 'EXPIRED') {
+       text = '⏰ ¡Tiempo agotado! 💔'; color = '#ef4444';
+    } else if (result.status === 'DEAD') {
+       text = '💔 ¡Sin Vidas!'; color = '#ef4444';
     }
 
     this.setData({
       phase: 'result',
       showOptionsOverlay: false,
       paperPulse: false,
-      feedbackText: '⏰ ¡Tiempo agotado! 💔',
-      feedbackColor: '#ef4444',
-      timerSeconds: 0
+      score: this.game.state.score,
+      livesText: this.getLivesText(this.game.state.lives),
+      feedbackText: text,
+      feedbackColor: color
     });
 
-    this.resultDelay = setTimeout(() => {
-      this.advanceOrEnd();
-    }, 1600);
-  },
-
-  advanceOrEnd() {
-    const nextIndex = this.data.currentIndex + 1;
-
-    if (this.data.totalQuestions > 0 && nextIndex >= this.data.totalQuestions) {
-      this.endGame();
+    if (result.status === 'DEAD') {
+      this.resultDelay = setTimeout(() => this.endGame(), 1500);
       return;
     }
 
-    let nextPool = this.data.questionPool;
+    this.resultDelay = setTimeout(() => this.advanceOrEnd(), 1500);
+  },
 
-    if (this.data.totalQuestions < 0 && nextIndex >= nextPool.length) {
-      nextPool = nextPool.concat(shuffleArray(QUESTIONS[this.data.category] || []));
+  advanceOrEnd() {
+    const isOver = this.game.isGameOver(this.data.questionPool.length);
+    if (isOver) {
+        this.endGame();
+        return;
     }
 
-    this.setData({
-      currentIndex: nextIndex,
-      questionPool: nextPool
-    });
+    this.game.nextQuestion();
+    
+    // handle infinite pool extension
+    let nextPool = this.data.questionPool;
+    if (this.data.totalQuestions <= 0 && this.game.state.currentIndex >= nextPool.length) {
+      nextPool = nextPool.concat(shuffleArray(QUESTIONS[this.data.category] || []));
+      this.setData({ questionPool: nextPool });
+    }
 
     this.startWalk();
   },
 
   endGame() {
     if (this.data.gameEnded) return;
-
     this.clearAllTimers();
+    this.setData({ gameEnded: true });
 
-    this.setData({
-      gameEnded: true
+    const total = this.data.totalQuestions > 0 ? this.data.totalQuestions : this.game.state.currentIndex;
+    const score = this.game.state.score;
+    const tokensEarned = score >= 50 ? Math.floor(score / 50) : 0;
+
+    saveStatsUseCase.execute({
+      gameId: 'detective_tokat',
+      tokensEarned: tokensEarned, 
+      currentScore: score
     });
 
-    const total = this.data.totalQuestions > 0 ? this.data.totalQuestions : this.data.currentIndex;
     my.redirectTo({
-      url: `/detectivetokat/pages/end/end?score=${this.data.score}&correct=${this.data.correctCount}&total=${total}&category=${this.data.category}&mode=${this.data.mode}&totalQuestions=${this.data.totalQuestions}`
+      url: `/pages/detective-tokat/pages/end/end?score=${score}&correct=${this.game.state.correctCount}&total=${total}&category=${this.data.category}&mode=${this.data.mode}&totalQuestions=${this.data.totalQuestions}`
     });
   }
 });

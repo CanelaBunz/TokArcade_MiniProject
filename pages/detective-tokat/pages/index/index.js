@@ -50,7 +50,7 @@ Page({
   openModeModal() {
     const category = this.data.currentCategory;
     my.redirectTo({
-      url: `/detectivetokat/pages/game/game?category=${category.id}&mode=infinite&totalQuestions=-1`
+      url: `/pages/detective-tokat/pages/game/game?category=${category.id}&mode=infinite&totalQuestions=-1`
     });
   }
 });

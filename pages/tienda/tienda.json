@@ -1,5 +1,6 @@
 {
   "usingComponents": {
-    "top-bar": "/components/organisms/top-bar/top-bar"
+    "top-bar": "/components/organisms/top-bar/top-bar",
+    "toka-button": "/components/atoms/toka-button/toka-button"
   }
 }

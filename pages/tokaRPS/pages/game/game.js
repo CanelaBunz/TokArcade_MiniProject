@@ -1,14 +1,18 @@
+import { TokaRpsGame } from '../../../../src/core/domain/game/TokaRpsGame';
+import { LocalStorageGameStatsRepository } from '../../../../src/core/infrastructure/storage/LocalStorageGameStatsRepository';
+import { SaveGameStatsUseCase } from '../../../../src/core/application/game/SaveGameStatsUseCase';
+
+const statsRepository = new LocalStorageGameStatsRepository();
+const saveStatsUseCase = new SaveGameStatsUseCase(statsRepository);
+
 Page({
   data: {
-    choices: ["Piedra", "Papel", "Tijeras"],
-
     totalTime: 50000,
     remainingTime: 50000,
 
     progress: 0,
     maxProgress: 150,
 
-    winPoints: 16,
     drawStreakCount: 0,
     drawStreakGoal: 4,
 
@@ -37,15 +41,14 @@ Page({
     resultText: 'Espera a "TIJERAS"',
     enemyChoiceText: "",
 
-    finalTitle: "",
-    finalMessage: "",
-
     isPaused: false,
     isCountingDown: false,
     countdownText: ""
   },
 
   onLoad() {
+    this.game = new TokaRpsGame();
+
     this.wordTimers = [];
     this.choiceWindowTimer = null;
     this.nextExchangeTimer = null;
@@ -61,47 +64,30 @@ Page({
   startGame() {
     this.clearRoundTimers();
     this.clearGlobalTimer();
+    this.game.start();
 
     this.setData({
-      choices: ["Piedra", "Papel", "Tijeras"],
-
       totalTime: 50000,
       remainingTime: 50000,
-
       progress: 0,
-      maxProgress: 150,
-
-      winPoints: 16,
       drawStreakCount: 0,
-      drawStreakGoal: 4,
-
       canChoose: false,
       roundResolved: false,
       gameEnded: false,
       inputLocked: false,
-
       roundToken: 0,
-
       timeText: "Tiempo: 50.0",
       timeColor: "#ffffff",
-
       drawCounterText: "Empates: 0/4",
       drawCounterColor: "#dfe6e9",
-
       progressPercent: 0,
       progressColor: "#74b9ff",
-
       tokatBoxColor: "#f39c12",
       tokatStateText: "Preparado",
-
       rhythmText: "Prepárate...",
       rhythmColor: "#ffffff",
-
       resultText: 'Espera a "TIJERAS"',
-      enemyChoiceText: "",
-
-      finalTitle: "",
-      finalMessage: ""
+      enemyChoiceText: ""
     });
 
     this.updateDrawCounter();
@@ -110,24 +96,20 @@ Page({
     this.startExchange();
   },
 
-  restartGame() {
-    this.startGame();
-  },
-
   startGlobalTimer() {
     this.clearGlobalTimer();
     this.globalTimer = setInterval(() => {
       if (this.data.gameEnded || this.data.isPaused || this.data.isCountingDown) return;
 
-      const nextRemaining = Math.max(0, this.data.remainingTime - 100);
+      const remaining = this.game.tickRemainingTime(100);
 
       this.setData({
-        remainingTime: nextRemaining
+        remainingTime: remaining
       });
 
       this.updateTimeLabel();
 
-      if (nextRemaining <= 0) {
+      if (remaining <= 0) {
         this.endGame(false);
       }
     }, 100);
@@ -165,38 +147,6 @@ Page({
     });
   },
 
-  resetDrawCounter() {
-    this.setData({
-      drawStreakCount: 0
-    });
-    this.updateDrawCounter();
-  },
-
-  addDrawCount() {
-    const nextCount = this.data.drawStreakCount + 1;
-
-    if (nextCount >= this.data.drawStreakGoal) {
-      const nextProgress = Math.min(this.data.maxProgress, this.data.progress + this.data.winPoints);
-
-      this.setData({
-        drawStreakCount: 0,
-        progress: nextProgress,
-        resultText: "¡4 empates!\nSe convirtió en avance de victoria",
-        tokatStateText: "Tokat quedó en equilibrio",
-        tokatBoxColor: "#74b9ff"
-      });
-
-      this.updateDrawCounter();
-      return "converted";
-    }
-
-    this.setData({
-      drawStreakCount: nextCount
-    });
-    this.updateDrawCounter();
-    return "counted";
-  },
-
   updateProgressBar() {
     const percent = (this.data.progress / this.data.maxProgress) * 100;
 
@@ -211,28 +161,6 @@ Page({
       progressPercent: percent,
       progressColor: color
     });
-  },
-
-  getCurrentBeat() {
-    const elapsed = this.data.totalTime - this.data.remainingTime;
-    const stage = Math.floor(elapsed / 5000);
-
-    const initialBeat = 470;
-    const reductionPerStage = 35;
-    const minBeat = 220;
-
-    return Math.max(minBeat, initialBeat - stage * reductionPerStage);
-  },
-
-  getChoiceWindow() {
-    const elapsed = this.data.totalTime - this.data.remainingTime;
-    const stage = Math.floor(elapsed / 5000);
-
-    const initialWindow = 360;
-    const reductionPerStage = 22;
-    const minWindow = 150;
-
-    return Math.max(minWindow, initialWindow - stage * reductionPerStage);
   },
 
   isRoundValid(token) {
@@ -252,18 +180,15 @@ Page({
       canChoose: false,
       roundResolved: false,
       inputLocked: false,
-
       tokatBoxColor: "#f39c12",
       tokatStateText: "Sigue el ritmo",
-
       resultText: 'Espera a "TIJERAS"',
       enemyChoiceText: "",
-
       rhythmText: "Prepárate...",
       rhythmColor: "#ffffff"
     });
 
-    const beat = this.getCurrentBeat();
+    const { beat, choiceWindow } = this.game.getBeatWindow();
 
     const words = [
       { text: "PIEDRA", color: "#2ecc71" },
@@ -294,7 +219,7 @@ Page({
     this.choiceWindowTimer = setTimeout(() => {
       if (!this.isRoundValid(token)) return;
       this.handleTimeout();
-    }, beat * 3 + this.getChoiceWindow());
+    }, beat * 3 + choiceWindow);
   },
 
   onChoiceTap(e) {
@@ -304,9 +229,7 @@ Page({
       return;
     }
 
-    this.setData({
-      inputLocked: true
-    });
+    this.setData({ inputLocked: true });
 
     if (!this.data.canChoose) {
       this.handleEarlyChoice(choice);
@@ -320,24 +243,23 @@ Page({
     if (this.data.roundResolved || this.data.gameEnded) return;
 
     this.clearRoundTimers();
+    this.game.state.drawStreakCount = 0; // Reset streak
 
     this.setData({
       roundResolved: true,
       canChoose: false,
       inputLocked: true,
       roundToken: this.data.roundToken + 1,
-
       rhythmText: choice.toUpperCase(),
       rhythmColor: "#ffffff",
-
       resultText: "¡Te adelantaste!\nPerdiste por romper el ritmo",
       enemyChoiceText: 'Solo puedes elegir en "TIJERAS"',
-
       tokatStateText: "Tokat te castigó",
-      tokatBoxColor: "#ff7675"
+      tokatBoxColor: "#ff7675",
+      drawStreakCount: 0
     });
 
-    this.resetDrawCounter();
+    this.updateDrawCounter();
     this.queueNextExchange(700);
   },
 
@@ -346,8 +268,9 @@ Page({
 
     this.clearRoundTimers();
 
-    const tokatChoice = this.data.choices[Math.floor(Math.random() * this.data.choices.length)];
-    const result = this.getRoundResult(choice, tokatChoice);
+    const tokatChoice = this.game.getTokatChoice();
+    const resultType = this.game.evaluateRound(choice, tokatChoice);
+    const resultData = this.game.handleResult(resultType);
 
     let rhythmColor = "#ffffff";
     if (choice === "Piedra") rhythmColor = "#2ecc71";
@@ -359,46 +282,43 @@ Page({
       canChoose: false,
       inputLocked: true,
       roundToken: this.data.roundToken + 1,
-
       rhythmText: choice.toUpperCase(),
       rhythmColor,
-      enemyChoiceText: `Tokat eligió: ${tokatChoice}`
+      enemyChoiceText: `Tokat eligió: ${tokatChoice}`,
+      progress: this.game.state.progress,
+      drawStreakCount: this.game.state.drawStreakCount
     });
 
-    if (result === "win") {
-      const nextProgress = Math.min(this.data.maxProgress, this.data.progress + this.data.winPoints);
-
+    if (resultData.status === "WIN") {
       this.setData({
-        progress: nextProgress,
         resultText: "¡Ganaste!\nLa barra avanzó bastante",
         tokatStateText: "Tokat recibió un golpecito",
         tokatBoxColor: "#55efc4"
       });
-
-      this.resetDrawCounter();
-    } else if (result === "draw") {
-      const drawResult = this.addDrawCount();
-
-      if (drawResult !== "converted") {
-        this.setData({
-          resultText: `¡Empate!\nAcumulas ${this.data.drawStreakCount}/${this.data.drawStreakGoal}`,
-          tokatStateText: "Empate",
-          tokatBoxColor: "#f1c40f"
-        });
-      }
+    } else if (resultData.status === "DRAW_CONVERTED") {
+       this.setData({
+        resultText: "¡4 empates!\nSe convirtió en avance de victoria",
+        tokatStateText: "Tokat quedó en equilibrio",
+        tokatBoxColor: "#74b9ff"
+      });
+    } else if (resultData.status === "DRAW") {
+      this.setData({
+        resultText: `¡Empate!\nAcumulas ${this.data.drawStreakCount}/${this.data.drawStreakGoal}`,
+        tokatStateText: "Empate",
+        tokatBoxColor: "#f1c40f"
+      });
     } else {
       this.setData({
         resultText: "Perdiste...\nLa barra no avanzó",
         tokatStateText: "¡Arañazo de Tokat!",
         tokatBoxColor: "#ff7675"
       });
-
-      this.resetDrawCounter();
     }
 
+    this.updateDrawCounter();
     this.updateProgressBar();
 
-    if (this.data.progress >= this.data.maxProgress) {
+    if (this.game.isMaxProgress()) {
       this.nextExchangeTimer = setTimeout(() => {
         this.endGame(true);
       }, 550);
@@ -412,24 +332,23 @@ Page({
     if (this.data.roundResolved || this.data.gameEnded) return;
 
     this.clearRoundTimers();
+    this.game.state.drawStreakCount = 0;
 
     this.setData({
       roundResolved: true,
       canChoose: false,
       inputLocked: true,
       roundToken: this.data.roundToken + 1,
-
       rhythmText: "¡TARDE!",
       rhythmColor: "#ff7675",
-
       resultText: 'No elegiste en "TIJERAS"\nLa barra no avanzó',
       enemyChoiceText: "Tokat aprovechó tu retraso",
-
       tokatStateText: "Tokat te arañó",
-      tokatBoxColor: "#ff7675"
+      tokatBoxColor: "#ff7675",
+      drawStreakCount: 0
     });
 
-    this.resetDrawCounter();
+    this.updateDrawCounter();
     this.queueNextExchange(550);
   },
 
@@ -438,20 +357,6 @@ Page({
       if (this.data.gameEnded || this.data.isPaused || this.data.isCountingDown) return;
       this.startExchange();
     }, delay);
-  },
-
-  getRoundResult(player, tokat) {
-    if (player === tokat) return "draw";
-
-    if (
-      (player === "Piedra" && tokat === "Tijeras") ||
-      (player === "Papel" && tokat === "Piedra") ||
-      (player === "Tijeras" && tokat === "Papel")
-    ) {
-      return "win";
-    }
-
-    return "lose";
   },
 
   endGame(playerWon) {
@@ -466,9 +371,17 @@ Page({
       inputLocked: true,
       roundToken: this.data.roundToken + 1
     });
+
+    const isWin = this.game.isMaxProgress() || playerWon;
+
+    saveStatsUseCase.execute({
+      gameId: 'toka_rps',
+      tokensEarned: isWin ? 5 : 1, // Reward system
+      currentScore: this.game.state.progress
+    });
   
     my.redirectTo({
-      url: `/tokaRPS/pages/end/end?playerWon=${playerWon ? 1 : 0}&progress=${this.data.progress}&maxProgress=${this.data.maxProgress}`
+      url: `/pages/tokaRPS/pages/end/end?playerWon=${isWin ? 1 : 0}&progress=${this.data.progress}&maxProgress=${this.data.maxProgress}`
     });
   },
 
@@ -499,12 +412,10 @@ Page({
     if (this.data.gameEnded || this.data.isCountingDown) return;
 
     if (!this.data.isPaused) {
-      // Pause
       this.clearRoundTimers();
       this.clearGlobalTimer();
       this.setData({ isPaused: true });
     } else {
-      // Resume via countdown
       this.startCountdown();
     }
   },

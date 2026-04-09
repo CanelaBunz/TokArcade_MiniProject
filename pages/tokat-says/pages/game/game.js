@@ -1,13 +1,19 @@
+import { TokatSaysGame } from '../../../../src/core/domain/game/TokatSaysGame';
+import { LocalStorageGameStatsRepository } from '../../../../src/core/infrastructure/storage/LocalStorageGameStatsRepository';
+import { SaveGameStatsUseCase } from '../../../../src/core/application/game/SaveGameStatsUseCase';
+
+const statsRepository = new LocalStorageGameStatsRepository();
+const saveStatsUseCase = new SaveGameStatsUseCase(statsRepository);
+
 Page({
   data: {
     round: 0,
-    sequence: [],
-    playerIndex: 0,
+    tokensEarned: 0,
+    sequenceLength: 0,
+
     isShowingSequence: false,
     isPlayerTurn: false,
     gameOver: false,
-
-    tokensEarned: 0,
 
     gestureTimeLimit: 2500,
     showSpeed: 600,
@@ -38,9 +44,7 @@ Page({
   },
 
   onLoad() {
-    this.gestures = ['↑', '↓', '←', '→'];
-    this.gesturesWithTap = ['↑', '↓', '←', '→', '✦'];
-
+    this.game = new TokatSaysGame();
     this.gestureColors = {
       '↑': '#38BDF8',
       '↓': '#10B981',
@@ -62,19 +66,15 @@ Page({
 
   startGame() {
     this.cleanupTimers();
+    this.game.start();
 
     this.setData({
       round: 0,
-      sequence: [],
-      playerIndex: 0,
+      tokensEarned: 0,
+      sequenceLength: 0,
       isShowingSequence: false,
       isPlayerTurn: false,
       gameOver: false,
-
-      tokensEarned: 0,
-
-      gestureTimeLimit: 2500,
-      showSpeed: 600,
 
       showTapButton: false,
       showTimer: false,
@@ -101,47 +101,35 @@ Page({
   },
 
   nextRound() {
-    const nextRound = this.data.round + 1;
-
-    const availableGestures = nextRound >= 5 ? this.gesturesWithTap : this.gestures;
-    const newGesture = availableGestures[Math.floor(Math.random() * availableGestures.length)];
-    const nextSequence = this.data.sequence.concat(newGesture);
-
-    const nextShowSpeed = Math.max(300, 600 - (nextRound - 1) * 25);
-    let nextGestureTimeLimit = this.data.gestureTimeLimit;
-
-    if (nextRound >= 5) {
-      nextGestureTimeLimit = Math.max(1200, 2500 - (nextRound - 5) * 150);
-    }
+    const roundData = this.game.nextRound();
 
     this.setData({
-      round: nextRound,
-      sequence: nextSequence,
-      playerIndex: 0,
+      round: roundData.round,
+      sequenceLength: roundData.sequence.length,
       isShowingSequence: true,
       isPlayerTurn: false,
-      showTapButton: nextRound >= 5,
-      showSpeed: nextShowSpeed,
-      gestureTimeLimit: nextGestureTimeLimit,
+      showTapButton: roundData.showTapButton,
+      showSpeed: roundData.showSpeed,
+      gestureTimeLimit: roundData.timeLimit,
+      
       showTimer: false,
       timerPercent: 100,
       timerColor: '#38BDF8',
+      
       tokatGestureText: '🐱',
       tokatGestureColor: '#ffffff',
       tokatBorderColor: '#38BDF8',
+      
       statusText: 'Tokat está mostrando...',
       statusColor: '#38BDF8'
     });
 
     this.setButtonsEnabled(false);
-    this.showSequence();
+    this.showSequence(roundData.sequence, roundData.showSpeed);
   },
 
-  showSequence() {
+  showSequence(sequence, speed) {
     if (this.data.isPaused || this.data.isCountingDown) return;
-
-    const sequence = this.data.sequence;
-    const speed = this.data.showSpeed;
 
     this.cleanupSequenceTimers();
 
@@ -186,19 +174,16 @@ Page({
     this.setData({
       isShowingSequence: false,
       isPlayerTurn: true,
-      playerIndex: 0,
       tokatGestureText: '🤔',
       tokatGestureColor: '#ffffff',
-      statusText: `¡Tu turno! (${this.data.sequence.length} gestos)`,
+      statusText: `¡Tu turno! (${this.data.sequenceLength} gestos)`,
       statusColor: '#10B981'
     });
 
     this.setButtonsEnabled(true);
 
     if (this.data.round >= 5) {
-      this.setData({
-        showTimer: true
-      });
+      this.setData({ showTimer: true });
       this.startGestureTimer();
     }
   },
@@ -249,57 +234,41 @@ Page({
     const gesture = e.currentTarget.dataset.gesture;
 
     if (!this.data.isPlayerTurn || this.data.gameOver || this.data.isPaused || this.data.isCountingDown) return;
-
     if (gesture === '✦' && !this.data.showTapButton) return;
 
     this.flashGesture(gesture);
-    this.handlePlayerInput(gesture);
-  },
+    
+    // Pass logic to the domain game engine
+    const result = this.game.handlePlayerInput(gesture);
 
-  handlePlayerInput(gesture) {
-    const expected = this.data.sequence[this.data.playerIndex];
-
-    if (gesture !== expected) {
+    if (result.status === 'WRONG') {
       this.endGame();
       return;
     }
 
-    const nextIndex = this.data.playerIndex + 1;
-
-    this.setData({
-      playerIndex: nextIndex
-    });
-
-    if (this.data.round >= 5 && nextIndex < this.data.sequence.length) {
+    if (this.data.round >= 5 && result.status !== 'ROUND_COMPLETE') {
       this.startGestureTimer();
     }
 
-    if (nextIndex >= this.data.sequence.length) {
-      this.handleRoundComplete();
+    if (result.status === 'ROUND_COMPLETE') {
+      this.handleRoundComplete(result.tokensEarned);
     }
   },
 
-  handleRoundComplete() {
+  handleRoundComplete(tokensEarned) {
     this.setData({
-      isPlayerTurn: false
-    });
-
-    this.setButtonsEnabled(false);
-    this.clearGestureTimer();
-
-    this.setData({
-      showTimer: false
-    });
-
-    this.checkTokenReward();
-
-    this.setData({
+      isPlayerTurn: false,
+      showTimer: false,
+      tokensEarned: tokensEarned,
       statusText: '¡Correcto! 🎉',
       statusColor: '#10B981',
       tokatGestureText: '😼',
       tokatGestureColor: '#ffffff',
       tokatBorderColor: '#10B981'
     });
+
+    this.setButtonsEnabled(false);
+    this.clearGestureTimer();
 
     this.nextRoundTimeout = setTimeout(() => {
       if (!this.data.gameOver && !this.data.isPaused && !this.data.isCountingDown) {
@@ -308,24 +277,25 @@ Page({
     }, 1200);
   },
 
-  checkTokenReward() {
-    if (this.data.round >= 5 && this.data.round % 5 === 0) {
-      this.setData({
-        tokensEarned: this.data.tokensEarned + 1
-      });
-    }
-  },
-
   endGame() {
     if (this.data.gameOver) return;
 
     this.cleanupTimers();
 
+    const gameState = this.game.getState();
+
+    // Use Application Layer to persist tokens and high score
+    saveStatsUseCase.execute({
+      gameId: 'tokat_says',
+      tokensEarned: gameState.tokensEarned,
+      currentScore: gameState.round
+    });
+
     this.setData({
       gameOver: true,
       isPlayerTurn: false,
       showTimer: false,
-      statusText: `¡Game Over! Ronda ${this.data.round}`,
+      statusText: `¡Game Over! Ronda ${gameState.round}`,
       statusColor: '#EF4444',
       tokatGestureText: '😿',
       tokatGestureColor: '#ffffff',
@@ -334,7 +304,7 @@ Page({
 
     setTimeout(() => {
       my.redirectTo({
-        url: `/tokaRythm/tokaRhytm/pages/end/end?round=${this.data.round}&tokens=${this.data.tokensEarned}&sequenceLen=${this.data.sequence.length}`
+        url: `/pages/tokat-says/pages/end/end?round=${gameState.round}&tokens=${gameState.tokensEarned}&sequenceLen=${gameState.sequence.length}`
       });
     }, 700);
   },
@@ -355,30 +325,11 @@ Page({
   flashGesture(gesture) {
     const resetValue = this.data.isPlayerTurn ? 1 : 0.4;
 
-    if (gesture === '↑') {
-      this.setData({ upOpacity: 1 });
-      this.scheduleOpacityReset('upOpacity', resetValue);
-    }
-
-    if (gesture === '↓') {
-      this.setData({ downOpacity: 1 });
-      this.scheduleOpacityReset('downOpacity', resetValue);
-    }
-
-    if (gesture === '←') {
-      this.setData({ leftOpacity: 1 });
-      this.scheduleOpacityReset('leftOpacity', resetValue);
-    }
-
-    if (gesture === '→') {
-      this.setData({ rightOpacity: 1 });
-      this.scheduleOpacityReset('rightOpacity', resetValue);
-    }
-
-    if (gesture === '✦') {
-      this.setData({ tapOpacity: 1 });
-      this.scheduleOpacityReset('tapOpacity', this.data.showTapButton ? resetValue : 0.4);
-    }
+    if (gesture === '↑') { this.setData({ upOpacity: 1 }); this.scheduleOpacityReset('upOpacity', resetValue); }
+    if (gesture === '↓') { this.setData({ downOpacity: 1 }); this.scheduleOpacityReset('downOpacity', resetValue); }
+    if (gesture === '←') { this.setData({ leftOpacity: 1 }); this.scheduleOpacityReset('leftOpacity', resetValue); }
+    if (gesture === '→') { this.setData({ rightOpacity: 1 }); this.scheduleOpacityReset('rightOpacity', resetValue); }
+    if (gesture === '✦') { this.setData({ tapOpacity: 1 }); this.scheduleOpacityReset('tapOpacity', this.data.showTapButton ? resetValue : 0.4); }
   },
 
   scheduleOpacityReset(key, value) {
@@ -404,7 +355,6 @@ Page({
       clearTimeout(this.gestureTimerTimeout);
       this.gestureTimerTimeout = null;
     }
-
     if (this.gestureTimerInterval) {
       clearInterval(this.gestureTimerInterval);
       this.gestureTimerInterval = null;
@@ -414,12 +364,7 @@ Page({
   cleanupTimers() {
     this.cleanupSequenceTimers();
     this.clearGestureTimer();
-
-    if (this.nextRoundTimeout) {
-      clearTimeout(this.nextRoundTimeout);
-      this.nextRoundTimeout = null;
-    }
-
+    if (this.nextRoundTimeout) clearTimeout(this.nextRoundTimeout);
     if (this.flashTimeouts && this.flashTimeouts.length) {
       this.flashTimeouts.forEach(timer => clearTimeout(timer));
     }
@@ -431,11 +376,9 @@ Page({
     if (this.data.gameOver || this.data.isCountingDown || this.data.showStartButton) return;
 
     if (!this.data.isPaused) {
-      // Pause
       this.cleanupTimers();
       this.setData({ isPaused: true });
     } else {
-      // Resume via countdown
       this.startCountdown();
     }
   },
@@ -458,9 +401,9 @@ Page({
         clearInterval(this.countdownInterval);
         this.setData({ isCountingDown: false });
         
-        // Resume logic: repeat sequence or resume turn
+        const state = this.game.getState();
         if (this.data.isShowingSequence) {
-          this.showSequence();
+          this.showSequence(state.sequence, this.data.showSpeed);
         } else if (this.data.isPlayerTurn) {
           this.startPlayerTurn();
         }
@@ -470,7 +413,7 @@ Page({
 
   exitGame() {
     my.redirectTo({
-      url: '/pages/tokat-says/tokaRhytm/pages/index/index'
+      url: '/pages/tokat-says/pages/index/index'
     });
   }
 });

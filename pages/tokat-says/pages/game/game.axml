@@ -1,44 +1,43 @@
 <view class="page">
   <view a:if="{{!showStartButton}}" class="pause-button-top" onTap="togglePause">⏸</view>
 
-  <view class="header">
-    <view class="title">TOKAT SAYS</view>
-    <view class="round-text">Ronda: {{round}}</view>
-    <view class="token-text">🪙 {{tokensEarned}} tokens</view>
-  </view>
+  <game-header 
+    title="TOKAT SAYS"
+    score="{{tokensEarned}}"
+    scoreLabel="TOKENS"
+    progress="{{timerPercent}}"
+    progressColor="{{timerColor}}"
+  />
 
-  <view class="tokat-box" style="border-color: {{tokatBorderColor}};">
-    <view class="tokat-label">TOKAT</view>
-    <view class="tokat-gesture" style="color: {{tokatGestureColor}};">{{tokatGestureText}}</view>
-  </view>
-
-  <view class="status-text" style="color: {{statusColor}};">{{statusText}}</view>
-
-  <view class="timer-wrap" a:if="{{showTimer}}">
-    <view class="timer-bar-bg">
-      <view class="timer-bar-fill" style="width: {{timerPercent}}%; background-color: {{timerColor}};"></view>
+  <view class="game-content">
+    <view class="tokat-box" style="border-color: {{tokatBorderColor}};">
+      <view class="tokat-label">TOKAT</view>
+      <view class="tokat-gesture" style="color: {{tokatGestureColor}};">{{tokatGestureText}}</view>
     </view>
-  </view>
 
-  <view class="start-card" a:if="{{showStartButton}}">
-    <view class="start-button" onTap="startGame">EMPEZAR</view>
-  </view>
+    <view class="status-text" style="color: {{statusColor}};">{{statusText}}</view>
+    <view class="round-indicator">Ronda: {{round}}</view>
 
-  <view class="controls">
-    <view class="pad">
-      <view class="gesture-btn up" style="opacity: {{upOpacity}};" data-gesture="↑" onTap="onGestureTap">↑</view>
-      <view class="gesture-btn left" style="opacity: {{leftOpacity}};" data-gesture="←" onTap="onGestureTap">←</view>
-      <view class="gesture-btn right" style="opacity: {{rightOpacity}};" data-gesture="→" onTap="onGestureTap">→</view>
-      <view class="gesture-btn down" style="opacity: {{downOpacity}};" data-gesture="↓" onTap="onGestureTap">↓</view>
+    <view class="start-card" a:if="{{showStartButton}}">
+      <toka-button onClick="startGame" fullWidth>EMPEZAR JUEGO</toka-button>
+    </view>
 
-      <view
-        a:if="{{showTapButton}}"
-        class="gesture-btn tap"
-        style="opacity: {{tapOpacity}};"
-        data-gesture="✦"
-        onTap="onGestureTap"
-      >
-        ✦
+    <view class="controls">
+      <view class="pad">
+        <view class="gesture-btn up" style="opacity: {{upOpacity}};" data-gesture="↑" onTap="onGestureTap">↑</view>
+        <view class="gesture-btn left" style="opacity: {{leftOpacity}};" data-gesture="←" onTap="onGestureTap">←</view>
+        <view class="gesture-btn right" style="opacity: {{rightOpacity}};" data-gesture="→" onTap="onGestureTap">→</view>
+        <view class="gesture-btn down" style="opacity: {{downOpacity}};" data-gesture="↓" onTap="onGestureTap">↓</view>
+
+        <view
+          a:if="{{showTapButton}}"
+          class="gesture-btn tap"
+          style="opacity: {{tapOpacity}};"
+          data-gesture="✦"
+          onTap="onGestureTap"
+        >
+          ✦
+        </view>
       </view>
     </view>
   </view>
@@ -47,8 +46,8 @@
   <view a:if="{{isPaused}}" class="modal-overlay">
     <view class="modal-card">
       <text class="modal-title">JUEGO EN PAUSA</text>
-      <view class="modal-btn resume" onTap="togglePause">Continuar</view>
-      <view class="modal-btn exit" onTap="exitGame">Salir</view>
+      <toka-button variant="primary" onClick="togglePause" fullWidth className="modal-spacing">Continuar</toka-button>
+      <toka-button variant="outline" onClick="exitGame" fullWidth>Salir</toka-button>
     </view>
   </view>
 
