@@ -1,6 +1,6 @@
 Page({
   data: {
-    tokatFrame: '/pages/tokaRPS/assets/tokat/frame0000.png',
+    tokatFrame: '/images/tokat/frame0000.png',
     idJuego: 'eyden-rps',
     nombreJuego: 'TOKA RPS RHYTHM'
   },
@@ -13,13 +13,13 @@ Page({
 
   onLoad() {
     this.frames = [
-      '/pages/tokaRPS/assets/tokat/frame0000.png',
-      '/pages/tokaRPS/assets/tokat/frame0001.png',
-      '/pages/tokaRPS/assets/tokat/frame0002.png',
-      '/pages/tokaRPS/assets/tokat/frame0003.png',
-      '/pages/tokaRPS/assets/tokat/frame0004.png',
-      '/pages/tokaRPS/assets/tokat/frame0005.png',
-      '/pages/tokaRPS/assets/tokat/frame0006.png'
+      '/images/tokat/frame0000.png',
+      '/images/tokat/frame0001.png',
+      '/images/tokat/frame0002.png',
+      '/images/tokat/frame0003.png',
+      '/images/tokat/frame0004.png',
+      '/images/tokat/frame0005.png',
+      '/images/tokat/frame0006.png'
     ];
 
     // Loop tipo ida y vuelta para que no “salte” raro

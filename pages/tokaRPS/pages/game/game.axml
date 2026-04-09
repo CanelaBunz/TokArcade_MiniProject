@@ -10,9 +10,14 @@
   />
 
   <view class="game-content">
-    <view class="tokat-box" style="background-color: {{tokatBoxColor}};">
-      <text class="tokat-title">TOKAT</text>
-      <text class="tokat-state">{{tokatStateText}}</text>
+
+    <!-- Tokat character center stage -->
+    <view class="tokat-stage">
+      <image
+        class="tokat-sprite"
+        src="{{tokatFrame}}"
+        mode="aspectFit"
+      />
     </view>
 
     <view class="rhythm-area">
@@ -29,33 +34,34 @@
       <text class="enemy-text">{{enemyChoiceText}}</text>
     </view>
 
+    <!-- Mano image buttons -->
     <view class="choices">
-      <toka-button 
-        className="choice-wrapper" 
-        variant="{{canChoose && !gameEnded ? 'primary' : 'secondary'}}" 
-        onClick="onChoiceTap" 
-        dataChoice="Piedra"
+      <view
+        class="choice-wrapper {{canChoose && !gameEnded ? 'choice-active' : 'choice-disabled'}}"
+        onTap="onChoiceTap"
+        data-choice="Piedra"
       >
-        PIEDRA
-      </toka-button>
+        <image class="mano-img" src="/images/Mano/ManoPiedra.png" mode="aspectFit" />
+        <text class="choice-label">PIEDRA</text>
+      </view>
 
-      <toka-button 
-        className="choice-wrapper" 
-        variant="{{canChoose && !gameEnded ? 'primary' : 'secondary'}}" 
-        onClick="onChoiceTap" 
-        dataChoice="Papel"
+      <view
+        class="choice-wrapper {{canChoose && !gameEnded ? 'choice-active' : 'choice-disabled'}}"
+        onTap="onChoiceTap"
+        data-choice="Papel"
       >
-        PAPEL
-      </toka-button>
+        <image class="mano-img" src="/images/Mano/ManoPapel.png" mode="aspectFit" />
+        <text class="choice-label">PAPEL</text>
+      </view>
 
-      <toka-button 
-        className="choice-wrapper" 
-        variant="{{canChoose && !gameEnded ? 'primary' : 'secondary'}}" 
-        onClick="onChoiceTap" 
-        dataChoice="Tijeras"
+      <view
+        class="choice-wrapper {{canChoose && !gameEnded ? 'choice-active' : 'choice-disabled'}}"
+        onTap="onChoiceTap"
+        data-choice="Tijeras"
       >
-        TIJERAS
-      </toka-button>
+        <image class="mano-img" src="/images/Mano/ManoTijeras.png" mode="aspectFit" />
+        <text class="choice-label">TIJERAS</text>
+      </view>
     </view>
   </view>
 
