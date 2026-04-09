@@ -1,5 +1,4 @@
-<!-- Perfil: Avatar, nombre y opciones del menú -->
-<!-- Equivalente a scenes/Perfil.js del frontend Phaser -->
+<!-- Perfil: Avatar, nombre, autorización personal y opciones -->
 <view class="page-container">
   <top-bar puntos="{{puntos}}" />
 
@@ -14,6 +13,37 @@
       <text class="nombre-usuario">{{usuario}}</text>
       <view class="nombre-linea"></view>
     </view>
+  </view>
+
+  <!-- Autorización de datos personales -->
+  <view class="opciones-lista">
+    <view class="opcion-item">
+      <text class="opcion-texto">Autorización de datos personales</text>
+    </view>
+
+    <view class="opcion-item">
+      <text class="opcion-texto">
+        Estado:
+        <text a:if="{{personalInfoAuthorized}}"> Autorizado</text>
+        <text a:if="{{!personalInfoAuthorized}}"> No autorizado</text>
+      </text>
+    </view>
+
+    <view class="opcion-item" a:if="{{personalInfoResultMsg}}">
+      <text class="opcion-texto">Mensaje: {{personalInfoResultMsg}}</text>
+    </view>
+
+    <view class="opcion-item" a:if="{{personalInfoAuthCode}}">
+      <text class="opcion-texto">AuthCode: {{personalInfoAuthCode}}</text>
+    </view>
+
+    <button onTap="solicitarAutorizacionPersonal" loading="{{requestingAuth}}">
+      Solicitar autorización personal
+    </button>
+
+    <button onTap="limpiarAutorizacionPersonal">
+      Limpiar autorización
+    </button>
   </view>
 
   <!-- Lista de Opciones -->
