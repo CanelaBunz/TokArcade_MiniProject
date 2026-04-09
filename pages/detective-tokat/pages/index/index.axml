@@ -1,0 +1,38 @@
+<view class="page">
+  <view class="bg-glow glow-1"></view>
+  <view class="bg-glow glow-2"></view>
+
+  <view class="header">
+    <view class="title">Detective Tokat</view>
+    <view class="subtitle">Investigación Académica</view>
+  </view>
+
+  <view class="general-desc">
+    Investiga la escena del crimen utilizando tu linterna para revelar preguntas ocultas. Tu misión es recuperar los archivos secretos respondiendo correctamente para avanzar por el corredor. ¡Demuestra tus conocimientos y resuelve el misterio!
+  </view>
+
+  <view class="carousel-wrap">
+    <view class="arrow left" onTap="prevCategory">‹</view>
+
+    <view class="card">
+      <view class="card-title">{{currentCategory.name}}</view>
+      <view class="card-desc">{{currentCategory.desc}}</view>
+
+      <view class="divider"></view>
+
+      <view class="modes-preview">Modo Infinito · 3 vidas</view>
+      <view class="hint">Pulsa JUGAR para comenzar</view>
+    </view>
+
+    <view class="arrow right" onTap="nextCategory">›</view>
+  </view>
+
+  <view class="dots">
+    <view class="dot {{selectedIndex === 0 ? 'active' : ''}}"></view>
+    <view class="dot {{selectedIndex === 1 ? 'active' : ''}}"></view>
+    <view class="dot {{selectedIndex === 2 ? 'active' : ''}}"></view>
+  </view>
+
+  <view class="play-btn" onTap="openModeModal">JUGAR</view>
+  <view class="leaderboard-btn" onTap="onLeaderboard">Ranking</view>
+</view>

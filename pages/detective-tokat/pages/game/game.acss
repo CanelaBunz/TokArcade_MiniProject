@@ -1,0 +1,300 @@
+.page {
+  min-height: 100vh;
+  /* Gradiente alineado con shell: #1a1a2e como base */
+  background: linear-gradient(180deg, #0d1020, #1a1a2e);
+  padding: 24rpx 20rpx 36rpx;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+
+.bg-glow {
+  position: absolute;
+  border-radius: 999rpx;
+  opacity: 0.14;
+}
+
+.hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.score { font-size: 28rpx; color: #c4b5fd; }
+.timer { font-size: 28rpx; color: #9ca3af; }
+.counter { font-size: 26rpx; color: #9ca3af; }
+
+.lives {
+  margin-top: 14rpx;
+  text-align: center;
+  color: #ffffff;
+  font-size: 28rpx;
+}
+
+.category-badge {
+  margin-top: 18rpx;
+  text-align: center;
+  font-size: 30rpx;
+  color: #8b5cf6;
+}
+
+.mode-badge {
+  margin-top: 8rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: #4b5563;
+}
+
+.scene-card {
+  margin-top: 30rpx;
+  min-height: 860rpx;
+  background: rgba(26, 23, 48, 0.95);
+  border: 4rpx solid rgba(124, 58, 237, 0.45);
+  border-radius: 28rpx;
+  padding: 30rpx 24rpx;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+}
+
+.walk-phase, .result-phase {
+  min-height: 780rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.walk-icon { font-size: 88rpx; }
+.walk-title {
+  margin-top: 24rpx;
+  font-size: 34rpx;
+  color: #c4b5fd;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Question Phase - Scratchable Mystery Box */
+.question-phase {
+  min-height: 780rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.paper-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 8rpx;
+}
+
+.paper-icon { font-size: 72rpx; }
+.paper-hint {
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: #6b7280;
+}
+
+.scratch-box {
+  margin-top: 36rpx;
+  position: relative;
+  width: 100%;
+  min-height: 400rpx;
+  border-radius: 24rpx;
+  overflow: hidden;
+  background: #111;
+  border: 6rpx solid #3e2723;
+  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.8);
+}
+
+.question-layer {
+  position: absolute;
+  inset: 0;
+  background: #fdf6e3;
+  padding: 40rpx 30rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.question-title {
+  font-size: 26rpx;
+  color: #7c3aed;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2rpx;
+  margin-bottom: 24rpx;
+  text-align: center;
+}
+
+.question-text {
+  font-size: 34rpx;
+  line-height: 1.6;
+  color: #111;
+  font-weight: bold;
+  text-align: center;
+}
+
+.darkness-layer {
+  position: absolute;
+  inset: 0;
+  background: #0d0b1a; /* Very dark blue-black */
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none; /* Touches pass through to #scratchContainer */
+
+  /* The magic bit: cutout hole */
+  /* We use radial-gradient as mask. Transparent in the middle, black elsewhere */
+  /* Since it's CSS, we'll try standard mask-image */
+}
+
+.darkness-pattern {
+  font-size: 160rpx;
+  color: rgba(124, 58, 237, 0.1);
+  font-weight: bold;
+}
+
+.floating-torch {
+  position: absolute;
+  width: 100rpx;
+  height: 100rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 72rpx;
+  z-index: 10;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 0 15rpx rgba(255, 255, 255, 0.4));
+}
+
+.torch-glow {
+  position: absolute;
+  width: 150rpx;
+  height: 150rpx;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(0, -30rpx); /* Slightly offset upward to match beam direction */
+}
+
+.tools {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.tool-instruction {
+  font-size: 26rpx;
+  color: #94a3b8;
+  text-align: center;
+  padding: 10rpx 0;
+  font-style: italic;
+}
+
+.tool.lens {
+  height: 96rpx;
+  border-radius: 20rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30rpx;
+  font-weight: bold;
+  background: #1e1b2f;
+  color: #c4b5fd;
+  border: 3rpx solid #7c3aed;
+}
+
+.tool.active {
+  background: rgba(124, 58, 237, 0.2);
+  box-shadow: 0 0 20rpx rgba(124, 58, 237, 0.5);
+}
+
+.feedback {
+  font-size: 42rpx;
+  font-weight: bold;
+  text-align: center;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.82);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24rpx;
+  box-sizing: border-box;
+  z-index: 100;
+}
+
+.overlay-card {
+  width: 100%;
+  background: #1a1730;
+  border: 4rpx solid #7c3aed;
+  border-radius: 24rpx;
+  padding: 30rpx 24rpx;
+  box-sizing: border-box;
+}
+
+.overlay-title {
+  font-size: 38rpx;
+  color: #e2e8f0;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 24rpx;
+}
+
+.tutorial-step {
+  font-size: 28rpx;
+  color: #c4b5fd;
+  margin-top: 16rpx;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.opt {
+  background: #2d2550;
+  border: 3rpx solid rgba(124, 58, 237, 0.45);
+  border-radius: 16rpx;
+  padding: 20rpx;
+  margin-top: 16rpx;
+  font-size: 30rpx;
+  color: #e2e8f0;
+  text-align: center;
+}
+
+.opt.selected {
+  background: #7c3aed;
+  border-color: #a78bfa;
+  font-weight: bold;
+}
+
+.confirm-btn {
+  margin: 28rpx auto 0;
+  width: 260rpx;
+  height: 82rpx;
+  border-radius: 18rpx;
+  background: #7c3aed;
+  color: #ffffff;
+  font-size: 30rpx;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pause-btn {
+  font-size: 32rpx;
+  color: #ffffff;
+  padding: 10rpx 40rpx;
+  background: rgba(124, 58, 237, 0.3);
+  border: 2rpx solid #7c3aed;
+  border-radius: 12rpx;
+}

@@ -5,5 +5,11 @@
   "compileType": "mini",
   "component2": true,
   "enableParallelLoader": true,
-  "enableDistFileMinify": true
+  "enableDistFileMinify": true,
+  "exclude": [
+    "**/.DS_Store",
+    "**/.git/**",
+    ".agents/**",
+    "**/*.md"
+  ]
 }

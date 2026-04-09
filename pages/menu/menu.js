@@ -1,9 +1,9 @@
 const app = getApp();
 
 const GAME_ROUTES = {
-  'detective-tokat': '/detectivetokat/tokaDetective/pages/index/index',
-  'tokat-says':      '/tokaRythm/tokaRhytm/pages/index/index',
-  'eyden-rps':       '/tokaRPS/tokaRPS/pages/index/index'
+  'detective-tokat': '/pages/detective-tokat/pages/index/index',
+  'tokat-says':      '/pages/tokat-says/pages/index/index',
+  'eyden-rps':       '/pages/tokaRPS/pages/index/index'
 };
 
 Page({

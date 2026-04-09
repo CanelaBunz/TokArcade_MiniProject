@@ -1,5 +1,5 @@
 {
   "usingComponents": {
-    "top-bar": "/components/top-bar/top-bar"
+    "top-bar": "/components/organisms/top-bar/top-bar"
   }
 }

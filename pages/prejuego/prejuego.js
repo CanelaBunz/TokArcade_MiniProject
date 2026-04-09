@@ -3,15 +3,15 @@ const app = getApp();
 const GAME_INFO = {
   'detective-tokat': {
     instrucciones: "¡Hola Detective! Alguien ha robado los archivos secretos de Tokat. Tu misión es recuperarlos respondiendo preguntas sobre Cultura, Arte o Historia.\n\nElige tu categoría y nivel de dificultad para comenzar la investigación. ¡Buena suerte!",
-    route: '/detectivetokat/tokaDetective/pages/index/index'
+    route: '/pages/detective-tokat/pages/index/index'
   },
   'tokat-says': {
     instrucciones: "Memoriza la secuencia que muestra Tokat y repite los gestos en el mismo orden. A partir de la ronda 5, prepárate para el botón TAP y el tiempo límite por gesto. ¡Gana tokens cada 5 rondas!",
-    route: '/tokaRythm/tokaRhytm/pages/index/index'
+    route: '/pages/tokat-says/pages/index/index'
   },
   'eyden-rps': {
     instrucciones: "¡Piedra, Papel o Tijera al ritmo de la música! Derrota a tus oponentes siguiendo el compás. Toca el gesto correcto en el momento preciso.",
-    route: '/tokaRPS/tokaRPS/pages/index/index'
+    route: '/pages/tokaRPS/pages/index/index'
   }
 };
 

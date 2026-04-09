@@ -1,0 +1,73 @@
+<view class="page">
+  <view class="pause-button-top" onTap="togglePause">⏸</view>
+  
+  <view class="title">Toka Rock Paper Scissors</view>
+
+  <view class="hud">
+    <text class="hud-text" style="color: {{timeColor}};">{{timeText}}</text>
+    <text class="hud-text small" style="color: {{drawCounterColor}};">{{drawCounterText}}</text>
+    <text class="hud-text">Progreso</text>
+
+    <view class="progress-bar">
+      <view
+        class="progress-fill"
+        style="width: {{progressPercent}}%; background-color: {{progressColor}}; {{progressPercent <= 0 ? 'display:none;' : ''}}"
+      ></view>
+    </view>
+  </view>
+
+  <view class="tokat-box" style="background-color: {{tokatBoxColor}};">
+    <text class="tokat-title">TOKAT</text>
+    <text class="tokat-state">{{tokatStateText}}</text>
+  </view>
+
+  <view class="rhythm-area">
+    <text class="rhythm-text" style="color: {{rhythmColor}};">{{rhythmText}}</text>
+  </view>
+
+  <view class="result-area">
+    <text class="result-text">{{resultText}}</text>
+    <text class="enemy-text">{{enemyChoiceText}}</text>
+  </view>
+
+  <view class="choices">
+    <view
+      class="choice-btn piedra {{canChoose && !gameEnded ? 'active' : ''}}"
+      data-choice="Piedra"
+      onTap="onChoiceTap"
+    >
+      Piedra
+    </view>
+
+    <view
+      class="choice-btn papel {{canChoose && !gameEnded ? 'active' : ''}}"
+      data-choice="Papel"
+      onTap="onChoiceTap"
+    >
+      Papel
+    </view>
+
+    <view
+      class="choice-btn tijeras {{canChoose && !gameEnded ? 'active' : ''}}"
+      data-choice="Tijeras"
+      onTap="onChoiceTap"
+    >
+      Tijeras
+    </view>
+  </view>
+
+  <!-- Pause Overlay -->
+  <view a:if="{{isPaused}}" class="modal-overlay">
+    <view class="modal-card">
+      <text class="modal-title">JUEGO EN PAUSA</text>
+      <view class="modal-btn resume" onTap="togglePause">Continuar</view>
+      <view class="modal-btn exit" onTap="exitGame">Salir</view>
+    </view>
+  </view>
+
+  <!-- Countdown Overlay -->
+  <view a:if="{{isCountingDown}}" class="modal-overlay countdown-overlay">
+    <text class="countdown-number">{{countdownText}}</text>
+  </view>
+
+</view>
