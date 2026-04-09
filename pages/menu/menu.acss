@@ -27,10 +27,9 @@
   padding: 20rpx;
 }
 
-.juego-icon {
-  width: 140rpx;
-  height: 140rpx;
-  opacity: 0.6;
+.juego-emoji {
+  font-size: 100rpx;
+  line-height: 1;
 }
 
 .juego-info {

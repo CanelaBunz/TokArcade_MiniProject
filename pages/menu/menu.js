@@ -10,9 +10,9 @@ Page({
   data: {
     puntos: 0,
     juegos: [
-      { id: 'tokat-says', nombre: 'TOKAT SAYS', nombreDisplay: 'TOKAT\nSAYS', color: '#38bdf8' },
-      { id: 'eyden-rps', nombre: 'TOKA RPS RHYTHM', nombreDisplay: 'TOKA RPS\nRHYTHM', color: '#10b981' },
-      { id: 'detective-tokat', nombre: 'DETECTIVE TOKAT', nombreDisplay: 'DETECTIVE\nTOKAT', color: '#8b5cf6' }
+      { id: 'tokat-says', nombre: 'TOKAT SAYS', nombreDisplay: 'TOKAT\nSAYS', color: '#38bdf8', emoji: '🐱' },
+      { id: 'eyden-rps', nombre: 'TOKA RPS RHYTHM', nombreDisplay: 'TOKA RPS\nRHYTHM', color: '#10b981', emoji: '✊' },
+      { id: 'detective-tokat', nombre: 'DETECTIVE TOKAT', nombreDisplay: 'DETECTIVE\nTOKAT', color: '#8b5cf6', emoji: '🔦' }
     ]
   },
 

@@ -15,7 +15,7 @@
       data-nombre="{{item.nombre}}"
     >
       <view class="juego-preview">
-        <image class="juego-icon" src="{{item.icon || '/images/icon_menu_juego_default.png'}}" mode="aspectFit" />
+        <text class="juego-emoji">{{item.emoji}}</text>
       </view>
       <view class="juego-info">
         <text class="juego-nombre">{{item.nombreDisplay}}</text>
