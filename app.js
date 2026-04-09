@@ -9,7 +9,7 @@ App({
   },
 
   globalData: {
-    puntos: 0,
+    puntos: 1000,
     usuario: 'Jugador_01',
 
     apiBaseUrl: 'https://talentland-toka.eastus2.cloudapp.azure.com',

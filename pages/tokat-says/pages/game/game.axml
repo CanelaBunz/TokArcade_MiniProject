@@ -82,4 +82,8 @@
       </view>
     </view>
   </view>
+
+  <view style="position: absolute; width: 0; height: 0; overflow: hidden; opacity: 0;">
+    <image a:for="{{allFrames}}" a:key="*this" src="{{item}}" />
+  </view>
 </view>

@@ -17,7 +17,7 @@
 .pause-button-top {
   position: absolute;
   top: 160rpx;
-  right: 32rpx;
+  left: 32rpx;
   width: 80rpx;
   height: 80rpx;
   display: flex;

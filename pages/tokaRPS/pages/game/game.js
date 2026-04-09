@@ -59,7 +59,8 @@ Page({
     isCountingDown: false,
     countdownText: '',
     showTutorialModal: false,
-    showContinueModal: false
+    showContinueModal: false,
+    allFrames: []
   },
 
   onLoad(query) {
@@ -73,6 +74,14 @@ Page({
 
     this.tokatAnimationTimer = null;
     this.tokatAnimations = this.buildTokatAnimations();
+
+    const allFrames = [];
+    Object.values(this.tokatAnimations).forEach(anim => {
+      anim.frames.forEach(f => {
+        if (!allFrames.includes(f)) allFrames.push(f);
+      });
+    });
+    this.setData({ allFrames });
 
     this.playTokatAnimation('idle');
 

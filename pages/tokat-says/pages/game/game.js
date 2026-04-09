@@ -66,7 +66,8 @@ Page({
     isPaused: false,
     isCountingDown: false,
     countdownText: '',
-    showContinueModal: false
+    showContinueModal: false,
+    allFrames: []
   },
 
   onLoad() {
@@ -78,6 +79,9 @@ Page({
       '→': '#EF4444',
       '✦': '#A855F7'
     };
+
+    const allFrames = [...new Set(Object.values(FRAMES).flat())];
+    this.setData({ allFrames });
 
     this.sequenceTimers = [];
     this.gestureTimerTimeout = null;
