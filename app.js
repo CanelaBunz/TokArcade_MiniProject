@@ -12,21 +12,22 @@ App({
     usuario: 'Jugador_01',
 
     apiBaseUrl: 'https://talentland-toka.eastus2.cloudapp.azure.com',
-    appId: '3500020265482079', 
+    appId: '3500020265482079',
 
     personalInfoAuthorized: false,
     personalInfoAuthCode: '',
     personalInfoResultMsg: '',
-    personalInfoScopes: {
-      USER_NAME: true,
-      USER_FIRST_SURNAME: true,
-      USER_SECOND_SURNAME: true,
-      USER_GENDER: true,
-      USER_BIRTHDAY: true,
-      USER_STATE_OF_BIRTH: true,
-      USER_NATIONALITY: true
-    },
 
+    // Mejor alineado con la guía de desarrollo
+    personalInfoScopes: [
+      'USER_NAME',
+      'USER_FIRST_SURNAME',
+      'USER_SECOND_SURNAME',
+      'USER_GENDER',
+      'USER_BIRTHDAY',
+      'USER_STATE_OF_BIRTH',
+      'USER_NATIONALITY'
+    ],
 
     userId: '',
     accessToken: '',

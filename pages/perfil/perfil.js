@@ -9,27 +9,13 @@ Page({
       { label: 'Configuración' },
       { label: 'Soporte' }
     ],
-
-    personalInfoAuthorized: false,
-    personalInfoAuthCode: '',
-    personalInfoResultMsg: '',
-    requestingAuth: false,
-
-    userId: '',
-    accessToken: '',
-    userInfo: null
+    cargandoUsuario: false
   },
 
   onShow() {
     this.setData({
       puntos: app.globalData.puntos,
-      usuario: app.globalData.usuario,
-      personalInfoAuthorized: app.globalData.personalInfoAuthorized,
-      personalInfoAuthCode: app.globalData.personalInfoAuthCode,
-      personalInfoResultMsg: app.globalData.personalInfoResultMsg,
-      userId: app.globalData.userId,
-      accessToken: app.globalData.accessToken,
-      userInfo: app.globalData.userInfo
+      usuario: app.globalData.usuario || 'Jugador_01'
     });
 
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
@@ -37,180 +23,170 @@ Page({
         selected: 2
       });
     }
+
+    this.cargarNombreUsuario(false);
   },
 
   onTapOpcion(e) {
     const label = e.currentTarget.dataset.label;
     console.log(`Abriendo sección: ${label}`);
-    my.showToast({ content: `Abriendo: ${label}` });
+    my.showToast({
+      content: `Abriendo: ${label}`
+    });
   },
 
-  solicitarAutorizacionPersonal() {
-    if (this.data.requestingAuth) return;
+  onTapPerfilHeader() {
+    // Reintento manual discreto, sin botones de prueba
+    this.cargarNombreUsuario(true);
+  },
+
+  async cargarNombreUsuario(mostrarErrores) {
+    if (this.data.cargandoUsuario) return;
+
+    // Si ya tenemos nombre real, no repetimos flujo
+    if (
+      app.globalData.usuario &&
+      app.globalData.usuario !== 'Jugador_01' &&
+      app.globalData.userInfo
+    ) {
+      this.setData({
+        usuario: app.globalData.usuario
+      });
+      return;
+    }
 
     this.setData({
-      requestingAuth: true
+      cargandoUsuario: true
     });
 
-    my.call('getUserPersonalInformationAuthCode', {
-      usage: 'Autorizar datos personales para pruebas de TokArcade',
-      scopes: app.globalData.personalInfoScopes,
+    try {
+      const authCode = await this.obtenerAuthCodePersonal();
+      await this.autenticarUsuario(authCode);
+      await this.obtenerInformacionUsuario();
 
-      success: async (apiRes) => {
-        console.log('getUserPersonalInformationAuthCode success:', apiRes);
+      this.setData({
+        usuario: app.globalData.usuario || 'Jugador_01',
+        cargandoUsuario: false
+      });
 
-        const resultCode = Number(apiRes.resultCode);
+      console.log('Nombre cargado correctamente:', app.globalData.usuario);
+    } catch (error) {
+      console.log('Error al cargar nombre de usuario:', error);
 
-        if (resultCode === 10000) {
-          const authCode = apiRes.result || '';
-          const resultMsg = apiRes.resultMsg || 'Autorización exitosa';
+      this.setData({
+        cargandoUsuario: false,
+        usuario: app.globalData.usuario || 'Jugador_01'
+      });
 
-          app.globalData.personalInfoAuthorized = true;
-          app.globalData.personalInfoAuthCode = authCode;
-          app.globalData.personalInfoResultMsg = resultMsg;
-
-          this.setData({
-            personalInfoAuthorized: true,
-            personalInfoAuthCode: authCode,
-            personalInfoResultMsg: resultMsg
-          });
-
-          my.showLoading({
-            content: 'Autenticando usuario...'
-          });
-
-          try {
-            await this.autenticarUsuario(authCode);
-            await this.obtenerInformacionUsuario();
-            my.hideLoading();
-
-            this.setData({
-              requestingAuth: false,
-              userId: app.globalData.userId,
-              accessToken: app.globalData.accessToken,
-              userInfo: app.globalData.userInfo
-            });
-
-            my.alert({
-              title: 'Éxito',
-              content: 'Autorización, autenticación y consulta de usuario completadas.'
-            });
-          } catch (error) {
-            my.hideLoading();
-
-            this.setData({
-              requestingAuth: false
-            });
-
-            my.alert({
-              title: 'Error en backend',
-              content: error.message || 'No se pudo completar el flujo de usuario.'
-            });
-          }
-        } else if (resultCode === 10006) {
-          const resultMsg = apiRes.resultMsg || 'El usuario rechazó la autorización.';
-
-          app.globalData.personalInfoAuthorized = false;
-          app.globalData.personalInfoAuthCode = '';
-          app.globalData.personalInfoResultMsg = resultMsg;
-
-          this.setData({
-            personalInfoAuthorized: false,
-            personalInfoAuthCode: '',
-            personalInfoResultMsg: resultMsg,
-            requestingAuth: false
-          });
-
-          my.alert({
-            title: 'Autorización rechazada',
-            content: resultMsg
-          });
-        } else {
-          const resultMsg = apiRes.resultMsg || 'Ocurrió un error en la autorización.';
-
-          app.globalData.personalInfoAuthorized = false;
-          app.globalData.personalInfoAuthCode = '';
-          app.globalData.personalInfoResultMsg = resultMsg;
-
-          this.setData({
-            personalInfoAuthorized: false,
-            personalInfoAuthCode: '',
-            personalInfoResultMsg: resultMsg,
-            requestingAuth: false
-          });
-
-          my.alert({
-            title: 'apiRes ERROR',
-            content: JSON.stringify(apiRes)
-          });
-        }
-      },
-
-      fail: (res) => {
-        console.log('getUserPersonalInformationAuthCode fail:', res);
-
-        this.setData({
-          requestingAuth: false
-        });
-
-        let mensaje = 'No se pudo solicitar la autorización en este entorno.';
-
-        if (res && res.errorMessage) {
-          if (
-            res.errorMessage.includes('暂不支持') ||
-            res.errorMessage.includes('真机调试')
-          ) {
-            mensaje = 'Esta función no está disponible en el simulador. Pruébala en un dispositivo real dentro de Toka.';
-          }
-        }
-
+      if (mostrarErrores) {
         my.alert({
-          title: 'Prueba en dispositivo real',
-          content: mensaje
+          title: 'No se pudo cargar tu nombre',
+          content: error.message || 'No fue posible obtener la información del usuario.'
         });
       }
+    }
+  },
+
+  obtenerAuthCodePersonal() {
+    return new Promise((resolve, reject) => {
+      my.call('getUserPersonalInformationAuthCode', {
+        usage: 'Autorizar datos personales para mostrar el nombre del usuario en TokArcade',
+        scopes: app.globalData.personalInfoScopes,
+        success: (apiRes) => {
+          console.log('getUserPersonalInformationAuthCode success:', apiRes);
+
+          const resultCode = Number(apiRes.resultCode);
+
+          if (resultCode === 10000) {
+            const authCode = apiRes.result || '';
+            const resultMsg = apiRes.resultMsg || 'Autorización exitosa';
+
+            app.globalData.personalInfoAuthorized = true;
+            app.globalData.personalInfoAuthCode = authCode;
+            app.globalData.personalInfoResultMsg = resultMsg;
+
+            resolve(authCode);
+          } else if (resultCode === 10006) {
+            reject(new Error(apiRes.resultMsg || 'El usuario rechazó la autorización.'));
+          } else {
+            reject(new Error(apiRes.resultMsg || 'No se pudo obtener el authCode personal.'));
+          }
+        },
+        fail: (res) => {
+          console.log('getUserPersonalInformationAuthCode fail:', res);
+
+          let mensaje = 'No se pudo solicitar la autorización en este entorno.';
+
+          if (res && res.errorMessage) {
+            if (
+              res.errorMessage.includes('暂不支持') ||
+              res.errorMessage.includes('真机调试')
+            ) {
+              mensaje = 'Esta función no está disponible en el simulador. Pruébala en un dispositivo real dentro de Toka.';
+            } else {
+              mensaje = res.errorMessage;
+            }
+          }
+
+          reject(new Error(mensaje));
+        }
+      });
     });
   },
 
   autenticarUsuario(authCode) {
     return new Promise((resolve, reject) => {
-      const appId = app.globalData.appId;
-      const apiBaseUrl = app.globalData.apiBaseUrl;
-
-      if (!appId || appId === 'PON_AQUI_TU_APP_ID') {
-        reject(new Error('Falta configurar app.globalData.appId con el App ID real.'));
-        return;
-      }
-
       my.request({
-        url: `${apiBaseUrl}/v1/user/authenticate`,
+        url: `${app.globalData.apiBaseUrl}/v1/user/authenticate`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-App-Id': appId
+          'X-App-Id': app.globalData.appId
         },
         data: {
           authcode: authCode
         },
         success: (res) => {
           console.log('authenticate response:', res);
-
+  
           const body = res.data || {};
-
+  
           if (body.success && body.data) {
             app.globalData.userId = body.data.userId || '';
             app.globalData.accessToken = body.data.accessToken || '';
             app.globalData.tokenType = body.data.tokenType || 'Bearer';
             app.globalData.expiresIn = body.data.expiresIn || 0;
-
             resolve(body.data);
           } else {
             reject(new Error(body.message || 'Falló la autenticación del usuario.'));
           }
         },
         fail: (err) => {
-          console.log('authenticate fail:', err);
-          reject(new Error('No se pudo llamar /v1/user/authenticate'));
+          console.log('authenticate fail completo:', JSON.stringify(err));
+  
+          const serverMessage =
+            err &&
+            err.data &&
+            err.data.message
+              ? err.data.message
+              : '';
+  
+          const serverBody =
+            err &&
+            err.data
+              ? JSON.stringify(err.data)
+              : '';
+  
+          const statusText =
+            err && err.errorMessage
+              ? err.errorMessage
+              : 'HTTP error en /v1/user/authenticate';
+  
+          reject(
+            new Error(
+              serverMessage || serverBody || statusText || 'Error desconocido en authenticate'
+            )
+          );
         }
       });
     });
@@ -218,8 +194,6 @@ Page({
 
   obtenerInformacionUsuario() {
     return new Promise((resolve, reject) => {
-      const appId = app.globalData.appId;
-      const apiBaseUrl = app.globalData.apiBaseUrl;
       const accessToken = app.globalData.accessToken;
       const authCode = app.globalData.personalInfoAuthCode;
 
@@ -229,16 +203,16 @@ Page({
       }
 
       if (!authCode) {
-        reject(new Error('No existe authCode personal para consultar la información del usuario.'));
+        reject(new Error('No existe authCode para consultar la información del usuario.'));
         return;
       }
 
       my.request({
-        url: `${apiBaseUrl}/v1/user/info`,
+        url: `${app.globalData.apiBaseUrl}/v1/user/info`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-App-Id': appId,
+          'X-App-Id': app.globalData.appId,
           'Authorization': `Bearer ${accessToken}`
         },
         data: {
@@ -251,12 +225,7 @@ Page({
 
           if (body.success && body.data) {
             app.globalData.userInfo = body.data;
-
-            if (body.data.fullName) {
-              app.globalData.usuario = body.data.fullName;
-            } else if (body.data.firstName) {
-              app.globalData.usuario = body.data.firstName;
-            }
+            app.globalData.usuario = this.obtenerNombreMostrable(body.data);
 
             resolve(body.data);
           } else {
@@ -271,27 +240,26 @@ Page({
     });
   },
 
-  limpiarAutorizacionPersonal() {
-    app.globalData.personalInfoAuthorized = false;
-    app.globalData.personalInfoAuthCode = '';
-    app.globalData.personalInfoResultMsg = '';
-    app.globalData.userId = '';
-    app.globalData.accessToken = '';
-    app.globalData.tokenType = 'Bearer';
-    app.globalData.expiresIn = 0;
-    app.globalData.userInfo = null;
+  obtenerNombreMostrable(userInfo) {
+    if (!userInfo) return 'Jugador_01';
 
-    this.setData({
-      personalInfoAuthorized: false,
-      personalInfoAuthCode: '',
-      personalInfoResultMsg: '',
-      userId: '',
-      accessToken: '',
-      userInfo: null
-    });
+    if (userInfo.fullName && String(userInfo.fullName).trim()) {
+      return String(userInfo.fullName).trim();
+    }
 
-    my.showToast({
-      content: 'Autorización limpiada'
-    });
+    const partes = [
+      userInfo.firstName,
+      userInfo.secondName,
+      userInfo.lastName
+    ]
+      .filter(Boolean)
+      .map((item) => String(item).trim())
+      .filter(Boolean);
+
+    if (partes.length > 0) {
+      return partes.join(' ');
+    }
+
+    return 'Jugador_01';
   }
 });

@@ -1,52 +1,19 @@
-<!-- Perfil: Avatar, nombre, autorización personal y opciones -->
 <view class="page-container">
   <top-bar puntos="{{puntos}}" />
 
-  <!-- Avatar y Nombre -->
-  <view class="perfil-header">
+  <view class="perfil-header" onTap="onTapPerfilHeader">
     <view class="avatar-container">
-      <view class="perfil-avatar-circle">
+      <view class="avatar-circle">
         <text class="avatar-emoji">👤</text>
       </view>
     </view>
+
     <view class="nombre-container">
       <text class="nombre-usuario">{{usuario}}</text>
       <view class="nombre-linea"></view>
     </view>
   </view>
 
-  <!-- Autorización de datos personales -->
-  <view class="opciones-lista">
-    <view class="opcion-item">
-      <text class="opcion-texto">Autorización de datos personales</text>
-    </view>
-
-    <view class="opcion-item">
-      <text class="opcion-texto">
-        Estado:
-        <text a:if="{{personalInfoAuthorized}}"> Autorizado</text>
-        <text a:if="{{!personalInfoAuthorized}}"> No autorizado</text>
-      </text>
-    </view>
-
-    <view class="opcion-item" a:if="{{personalInfoResultMsg}}">
-      <text class="opcion-texto">Mensaje: {{personalInfoResultMsg}}</text>
-    </view>
-
-    <view class="opcion-item" a:if="{{personalInfoAuthCode}}">
-      <text class="opcion-texto">AuthCode: {{personalInfoAuthCode}}</text>
-    </view>
-
-    <button onTap="solicitarAutorizacionPersonal" loading="{{requestingAuth}}">
-      Solicitar autorización personal
-    </button>
-
-    <button onTap="limpiarAutorizacionPersonal">
-      Limpiar autorización
-    </button>
-  </view>
-
-  <!-- Lista de Opciones -->
   <view class="opciones-lista">
     <view
       class="opcion-item"
@@ -59,9 +26,4 @@
       <text class="opcion-flecha">></text>
     </view>
   </view>
-<<<<<<< HEAD
 </view>
-
-=======
-</view>
->>>>>>> 229457c31bb6d865af84d570d005e10e93f35b2c
