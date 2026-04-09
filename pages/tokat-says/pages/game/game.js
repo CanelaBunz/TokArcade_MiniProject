@@ -5,6 +5,21 @@ import { SaveGameStatsUseCase } from '../../../../src/core/application/game/Save
 const statsRepository = new LocalStorageGameStatsRepository();
 const saveStatsUseCase = new SaveGameStatsUseCase(statsRepository);
 
+const BASE = '/images/tokat/';
+
+const FRAMES = {
+  idle: [0, 1, 2, 3, 4, 5, 6].map(i => `${BASE}frame${String(i).padStart(4, '0')}.png`),
+  neutral: [`${BASE}TBO0000.png`],
+  up: [0, 1, 2, 3, 4, 5, 6].map(i => `${BASE}TW${String(i).padStart(4, '0')}.png`),
+  down: [0, 1, 2, 3, 4, 5].map(i => `${BASE}TL1${String(i).padStart(4, '0')}.png`),
+  left: [
+    `${BASE}TBO0000.png`, `${BASE}TBO0001.png`, `${BASE}TBO0002.png`, `${BASE}TBO0003.png`,
+    `${BASE}TBP0000.png`, `${BASE}TBP0001.png`
+  ],
+  right: [0, 1, 2, 3].map(i => `${BASE}TBPa${String(i).padStart(4, '0')}.png`),
+  center: [0, 1, 2].map(i => `${BASE}TR${String(i).padStart(4, '0')}.png`)
+};
+
 Page({
   data: {
     round: 0,
@@ -23,9 +38,10 @@ Page({
     timerPercent: 100,
     timerColor: '#38BDF8',
 
-    tokatGestureText: '🐱',
+    tokatGestureText: '',
     tokatGestureColor: '#ffffff',
     tokatBorderColor: '#38BDF8',
+    tokatSprite: FRAMES.neutral[0],
 
     statusText: 'Presiona EMPEZAR',
     statusColor: '#E2E8F0',
@@ -58,11 +74,91 @@ Page({
     this.gestureTimerInterval = null;
     this.nextRoundTimeout = null;
     this.flashTimeouts = [];
+
+    this._animTimer = null;
+    this._animQueue = null;
+
+    // Start with Idle Animation
+    this._loopAnim(FRAMES.idle, 7);
   },
 
   onUnload() {
     this.cleanupTimers();
   },
+
+  // ─── Animation System ─────────────────────────────────────────────────────────
+
+  _loopAnim(frames, fps) {
+    this._stopAnim();
+    let pointer = 0;
+    const delay = Math.floor(1000 / fps);
+    const seq = [...frames, ...[...frames].reverse().slice(1, -1)];
+    this.setData({ tokatSprite: seq[0] });
+
+    this._animTimer = setInterval(() => {
+      pointer = (pointer + 1) % seq.length;
+      this.setData({ tokatSprite: seq[pointer] });
+    }, delay);
+  },
+
+  _onceAnim(frames, totalDuration, onDone) {
+    this._stopAnim();
+    if (!frames || frames.length === 0) {
+      if (onDone) onDone();
+      return;
+    }
+
+    const delay = Math.floor(totalDuration / frames.length);
+    let pointer = 0;
+    this.setData({ tokatSprite: frames[0] });
+
+    const tick = () => {
+      pointer++;
+      if (pointer < frames.length) {
+        this.setData({ tokatSprite: frames[pointer] });
+        this._animQueue = setTimeout(tick, delay);
+      } else {
+        if (onDone) onDone();
+      }
+    };
+
+    this._animQueue = setTimeout(tick, delay);
+  },
+
+  _stopAnim() {
+    if (this._animTimer) {
+      clearInterval(this._animTimer);
+      this._animTimer = null;
+    }
+    if (this._animQueue) {
+      clearTimeout(this._animQueue);
+      this._animQueue = null;
+    }
+  },
+
+  _setNeutral() {
+    this._stopAnim();
+    this.setData({ tokatSprite: FRAMES.neutral[0] });
+  },
+
+  playGestureAnim(gesture, duration) {
+    // Determine frames based on gesture
+    let frames = FRAMES.neutral;
+    if (gesture === '↑') frames = FRAMES.up;
+    if (gesture === '↓') frames = FRAMES.down;
+    if (gesture === '←') frames = FRAMES.left;
+    if (gesture === '→') frames = FRAMES.right;
+    if (gesture === '✦') frames = FRAMES.center;
+
+    // Scale duration to fit the gesture showcase period (usually ~70% of showSpeed)
+    // We add a tiny offset so it completes before resetting to neutral
+    this._onceAnim(frames, duration, () => {
+       // Revert back directly to neutral after gesture is done
+       this._setNeutral();
+    });
+  },
+
+  // ─── Game Logic ─────────────────────────────────────────────────────────────
 
   startGame() {
     this.cleanupTimers();
@@ -81,7 +177,7 @@ Page({
       timerPercent: 100,
       timerColor: '#38BDF8',
 
-      tokatGestureText: '🐱',
+      tokatGestureText: '',
       tokatGestureColor: '#ffffff',
       tokatBorderColor: '#38BDF8',
 
@@ -116,7 +212,7 @@ Page({
       timerPercent: 100,
       timerColor: '#38BDF8',
       
-      tokatGestureText: '🐱',
+      tokatGestureText: '',
       tokatGestureColor: '#ffffff',
       tokatBorderColor: '#38BDF8',
       
@@ -125,7 +221,14 @@ Page({
     });
 
     this.setButtonsEnabled(false);
-    this.showSequence(roundData.sequence, roundData.showSpeed);
+    
+    // Set to neutral state when Tokat starts showing
+    this._setNeutral();
+    
+    // Add small delay before showing sequence
+    this.nextRoundTimeout = setTimeout(() => {
+      this.showSequence(roundData.sequence, roundData.showSpeed);
+    }, 500);
   },
 
   showSequence(sequence, speed) {
@@ -146,13 +249,17 @@ Page({
         });
 
         this.flashGesture(gesture);
+        
+        const animDuration = Math.floor(speed * 0.7);
+        this.playGestureAnim(gesture, animDuration);
 
         const resetTimer = setTimeout(() => {
           if (this.data.gameOver || this.data.isPaused || this.data.isCountingDown) return;
           this.setData({
-            tokatBorderColor: '#38BDF8'
+            tokatBorderColor: '#38BDF8',
+            tokatGestureText: ''
           });
-        }, Math.floor(speed * 0.7));
+        }, animDuration);
 
         this.flashTimeouts.push(resetTimer);
       }, speed * (index + 1));
@@ -174,11 +281,14 @@ Page({
     this.setData({
       isShowingSequence: false,
       isPlayerTurn: true,
-      tokatGestureText: '🤔',
+      tokatGestureText: '',
       tokatGestureColor: '#ffffff',
       statusText: `¡Tu turno! (${this.data.sequenceLength} gestos)`,
       statusColor: '#10B981'
     });
+
+    // Animate idle while waiting for player
+    this._loopAnim(FRAMES.idle, 7);
 
     this.setButtonsEnabled(true);
 
@@ -238,7 +348,15 @@ Page({
 
     this.flashGesture(gesture);
     
-    // Pass logic to the domain game engine
+    // Animate player gesture on Tokat slightly
+    this.playGestureAnim(gesture, 300);
+    // Overwrite the timeout to revert to idle instead of neutral since it's player turn
+    setTimeout(() => {
+      if (this.data.isPlayerTurn && !this.data.gameOver) {
+        this._loopAnim(FRAMES.idle, 7);
+      }
+    }, 300);
+
     const result = this.game.handlePlayerInput(gesture);
 
     if (result.status === 'WRONG') {
@@ -262,10 +380,13 @@ Page({
       tokensEarned: tokensEarned,
       statusText: '¡Correcto! 🎉',
       statusColor: '#10B981',
-      tokatGestureText: '😼',
+      tokatGestureText: '',
       tokatGestureColor: '#ffffff',
       tokatBorderColor: '#10B981'
     });
+
+    // Play a happy gesture briefly
+    this._onceAnim(FRAMES.up, 600, () => this._setNeutral());
 
     this.setButtonsEnabled(false);
     this.clearGestureTimer();
@@ -284,7 +405,6 @@ Page({
 
     const gameState = this.game.getState();
 
-    // Use Application Layer to persist tokens and high score
     saveStatsUseCase.execute({
       gameId: 'tokat_says',
       tokensEarned: gameState.tokensEarned,
@@ -297,16 +417,19 @@ Page({
       showTimer: false,
       statusText: `¡Game Over! Ronda ${gameState.round}`,
       statusColor: '#EF4444',
-      tokatGestureText: '😿',
+      tokatGestureText: '',
       tokatGestureColor: '#ffffff',
       tokatBorderColor: '#EF4444'
     });
 
-    setTimeout(() => {
-      my.redirectTo({
-        url: `/pages/tokat-says/pages/end/end?round=${gameState.round}&tokens=${gameState.tokensEarned}&sequenceLen=${gameState.sequence.length}`
-      });
-    }, 700);
+    // Sad animation for losing
+    this._onceAnim(FRAMES.down, 600, () => {
+      setTimeout(() => {
+        my.redirectTo({
+          url: `/pages/tokat-says/pages/end/end?round=${gameState.round}&tokens=${gameState.tokensEarned}&sequenceLen=${gameState.sequence.length}`
+        });
+      }, 700);
+    });
   },
 
   setButtonsEnabled(enabled) {
@@ -364,6 +487,7 @@ Page({
   cleanupTimers() {
     this.cleanupSequenceTimers();
     this.clearGestureTimer();
+    this._stopAnim();
     if (this.nextRoundTimeout) clearTimeout(this.nextRoundTimeout);
     if (this.flashTimeouts && this.flashTimeouts.length) {
       this.flashTimeouts.forEach(timer => clearTimeout(timer));

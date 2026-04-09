@@ -43,6 +43,7 @@
   margin: 20rpx auto 0;
   width: 520rpx;
   min-height: 280rpx;
+  position: relative;
   border-radius: 28rpx;
   border-width: 6rpx;
   border-style: solid;
@@ -63,10 +64,28 @@
   letter-spacing: 4rpx;
 }
 
+.tokat-stage {
+  width: 200rpx;
+  height: 200rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8rpx;
+}
+
+.tokat-sprite {
+  width: 200rpx;
+  height: 200rpx;
+}
+
 .tokat-gesture {
   font-size: 110rpx;
   font-weight: bold;
   line-height: 1;
+  position: absolute;
+  bottom: 10rpx;
+  right: 20rpx;
+  text-shadow: 0 4rpx 10rpx rgba(0,0,0,0.5);
 }
 
 .status-text {

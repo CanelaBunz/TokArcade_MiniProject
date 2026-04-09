@@ -12,6 +12,13 @@
   <view class="game-content">
     <view class="tokat-box" style="border-color: {{tokatBorderColor}};">
       <view class="tokat-label">TOKAT</view>
+      
+      <!-- Animación de Tokat -->
+      <view class="tokat-stage">
+        <image class="tokat-sprite" src="{{tokatSprite}}" mode="aspectFit" />
+      </view>
+
+      <!-- Flecha/Gestor -->
       <view class="tokat-gesture" style="color: {{tokatGestureColor}};">{{tokatGestureText}}</view>
     </view>
 
