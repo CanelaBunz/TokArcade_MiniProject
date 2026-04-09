@@ -1,0 +1,8 @@
+<button 
+  class="toka-button {{variant}} {{size}} {{fullWidth ? 'full-width' : ''}} {{loading ? 'loading' : ''}} {{className}}" 
+  onTap="handleTap"
+  disabled="{{disabled || loading}}"
+>
+  <view a:if="{{loading}}" class="spinner"></view>
+  <slot a:else />
+</button>

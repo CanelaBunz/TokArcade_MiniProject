@@ -10,18 +10,19 @@
   margin-bottom: 40rpx;
 }
 
+/* #800000 reemplazado por #c0392b (menos agresivo) */
 .btn-back {
   width: 100rpx;
   height: 100rpx;
-  background-color: #800000;
+  background-color: #c0392b;
   border: 4rpx solid #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+/* color heredado de page{} en app.acss */
 .btn-back-text {
-  color: #ffffff;
   font-size: 40rpx;
   font-weight: bold;
 }
@@ -31,10 +32,9 @@
   margin-bottom: 60rpx;
 }
 
+/* color y font-family heredados de page{} en app.acss */
 .juego-titulo {
-  color: #ffffff;
   font-size: 48rpx;
-  font-family: Courier, monospace;
   font-weight: bold;
 }
 
@@ -51,8 +51,8 @@
   margin-bottom: 20rpx;
 }
 
+/* color heredado de page{} en app.acss */
 .instrucciones-text {
-  color: #ffffff;
   font-size: 28rpx;
   line-height: 1.6;
 }
@@ -82,8 +82,8 @@
   box-shadow: 0 4rpx 0 #2e7d32;
 }
 
+/* color heredado de page{} en app.acss */
 .btn-jugar-text {
-  color: #ffffff;
   font-size: 40rpx;
   font-weight: bold;
 }
@@ -103,8 +103,8 @@
   opacity: 0.8;
 }
 
+/* color heredado de page{} en app.acss */
 .btn-leaderboard-text {
-  color: #ffffff;
   font-size: 30rpx;
   font-weight: bold;
 }

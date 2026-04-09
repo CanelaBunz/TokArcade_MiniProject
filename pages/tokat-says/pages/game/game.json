@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "game-header": "../../../../components/molecules/game-header/game-header",
+    "toka-progress": "../../../../components/atoms/toka-progress/toka-progress",
+    "toka-button": "../../../../components/atoms/toka-button/toka-button"
+  }
+}

@@ -27,10 +27,9 @@
   padding: 20rpx;
 }
 
-.juego-icon {
-  width: 140rpx;
-  height: 140rpx;
-  opacity: 0.6; /* Subtle look for placeholders */
+.juego-emoji {
+  font-size: 100rpx;
+  line-height: 1;
 }
 
 .juego-info {
@@ -44,10 +43,9 @@
   transform: scale(0.96);
 }
 
+/* color y font-family heredados de page{} en app.acss */
 .juego-nombre {
-  color: #ffffff;
   font-size: 24rpx;
-  font-family: Courier, monospace;
   text-align: center;
   line-height: 1.2;
   display: block;

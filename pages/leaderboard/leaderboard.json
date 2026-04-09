@@ -1,0 +1,6 @@
+{
+  "defaultTitle": "Leaderboard",
+  "usingComponents": {
+    "top-bar": "/components/organisms/top-bar/top-bar"
+  }
+}

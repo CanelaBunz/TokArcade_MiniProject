@@ -1,0 +1,18 @@
+<view class="page">
+  <view class="title">Toka Rock Paper Scissors</view>
+
+  <image
+    class="tokat-sprite"
+    src="{{tokatFrame}}"
+    mode="aspectFit"
+  />
+
+  <view class="description">
+    Entra al ritmo, espera el momento justo y vence a Tokat antes de que se acabe el tiempo.
+  </view>
+
+  <view class="play-button" onTap="startGame">
+    JUGAR
+  </view>
+  <view class="leaderboard-btn" onTap="onLeaderboard">Ranking</view>
+</view>

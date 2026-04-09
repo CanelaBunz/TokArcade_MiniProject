@@ -1,0 +1,10 @@
+<view class="game-header">
+  <view class="header-top">
+    <text class="game-title">{{title}}</text>
+    <view class="score-badge">
+      <text class="score-label">{{scoreLabel}}</text>
+      <text class="score-value">{{score}}</text>
+    </view>
+  </view>
+  <toka-progress percent="{{progress}}" color="{{progressColor}}" />
+</view>

@@ -1,0 +1,6 @@
+<view class="toka-progress {{className}}">
+  <view 
+    class="toka-progress-bar" 
+    style="width: {{percent}}%; background-color: {{color}};"
+  ></view>
+</view>

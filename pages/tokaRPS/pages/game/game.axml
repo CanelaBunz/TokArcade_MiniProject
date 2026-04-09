@@ -1,0 +1,146 @@
+<view class="page">
+  <view class="pause-button-top" onTap="togglePause">⏸</view>
+
+  <game-header 
+    title="TOKA RPS"
+    score="{{progress}}"
+    scoreLabel="PUNTOS"
+    progress="{{progressPercent}}"
+    progressColor="{{progressColor}}"
+  />
+
+  <view class="game-content">
+    <view class="helper-card">
+      <text class="helper-main" style="color: {{helperColor}};">{{helperText}}</text>
+      <text class="helper-sub">Ritmo actual: {{paceLabel}}</text>
+    </view>
+
+    <view class="tokat-stage">
+      <image class="tokat-sprite" src="{{tokatFrame}}" mode="aspectFit" />
+      <text class="tokat-state">{{tokatStateText}}</text>
+    </view>
+
+    <view class="rhythm-area">
+      <text class="rhythm-text" style="color: {{rhythmColor}};">{{rhythmText}}</text>
+    </view>
+
+    <view class="hud-center">
+      <text class="hud-text" style="color: {{timeColor}};">{{timeText}}</text>
+      <text class="hud-text small" style="color: {{drawCounterColor}};">{{drawCounterText}}</text>
+    </view>
+
+    <view class="result-area">
+      <text class="result-text">{{resultText}}</text>
+      <text class="enemy-text">{{enemyChoiceText}}</text>
+    </view>
+
+    <view class="choices">
+      <view
+        class="choice-wrapper {{canChoose && !gameEnded ? 'choice-active' : 'choice-disabled'}}"
+        onTap="onChoiceTap"
+        data-choice="Piedra"
+      >
+        <image class="mano-img" src="/images/Mano/ManoPiedra.png" mode="aspectFit" />
+        <text class="choice-label">PIEDRA</text>
+      </view>
+
+      <view
+        class="choice-wrapper {{canChoose && !gameEnded ? 'choice-active' : 'choice-disabled'}}"
+        onTap="onChoiceTap"
+        data-choice="Papel"
+      >
+        <image class="mano-img" src="/images/Mano/ManoPapel.png" mode="aspectFit" />
+        <text class="choice-label">PAPEL</text>
+      </view>
+
+      <view
+        class="choice-wrapper {{canChoose && !gameEnded ? 'choice-active' : 'choice-disabled'}}"
+        onTap="onChoiceTap"
+        data-choice="Tijeras"
+      >
+        <image class="mano-img" src="/images/Mano/ManoTijeras.png" mode="aspectFit" />
+        <text class="choice-label">TIJERAS</text>
+      </view>
+    </view>
+  </view>
+
+  <view a:if="{{isPaused}}" class="modal-overlay">
+    <view class="modal-card">
+      <text class="modal-title">JUEGO EN PAUSA</text>
+      <toka-button variant="primary" onClick="togglePause" fullWidth className="modal-spacing">Continuar</toka-button>
+      <toka-button variant="outline" onClick="exitGame" fullWidth>Salir</toka-button>
+    </view>
+  </view>
+
+  <view a:if="{{isCountingDown}}" class="modal-overlay countdown-overlay">
+    <text class="countdown-number">{{countdownText}}</text>
+  </view>
+
+  <view a:if="{{showTutorialModal}}" class="modal-overlay tutorial-overlay">
+    <view class="tutorial-card">
+      <text class="tutorial-title">Cómo jugar</text>
+
+      <view class="tutorial-step">
+        <image class="tutorial-img" src="/images/Mano/ManoPiedra.png" mode="aspectFit" />
+        <view class="tutorial-copy">
+          <text class="tutorial-step-title">Sigue el ritmo</text>
+          <text class="tutorial-step-text">Observa la secuencia: PIEDRA, PAPEL, O...</text>
+        </view>
+      </view>
+
+      <view class="tutorial-step">
+        <image class="tutorial-img" src="/images/Mano/ManoTijeras.png" mode="aspectFit" />
+        <view class="tutorial-copy">
+          <text class="tutorial-step-title">Toca solo en ¡TIJERAS!</text>
+          <text class="tutorial-step-text">Antes de eso, los botones están desactivados.</text>
+        </view>
+      </view>
+
+      <view class="tutorial-step tutorial-step-last">
+        <image class="tutorial-img" src="/images/Mano/ManoPapel.png" mode="aspectFit" />
+        <view class="tutorial-copy">
+          <text class="tutorial-step-title">Avanza con victorias y empates</text>
+          <text class="tutorial-step-text">Ganar empuja mucho la barra. Con 4 empates seguidos también avanzas.</text>
+        </view>
+      </view>
+
+      <view class="tutorial-rhythm-strip">
+        <text class="rhythm-chip green-chip">PIEDRA</text>
+        <text class="rhythm-chip orange-chip">PAPEL</text>
+        <text class="rhythm-chip yellow-chip">O...</text>
+        <text class="rhythm-chip red-chip">¡TIJERAS!</text>
+      </view>
+
+      <text class="tutorial-note">Consejo: el juego empieza más calmado y luego acelera poco a poco. No te adelantes; espera el momento de ¡TIJERAS!</text>
+
+      <view class="tutorial-start-btn" onTap="beginFromTutorial">
+        <text class="tutorial-start-text">¡ENTENDIDO, A JUGAR!</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Pay to Continue Modal -->
+  <view a:if="{{showContinueModal}}" class="modal-overlay">
+    <view class="modal-card">
+      <view class="modal-header">
+        <text class="modal-title">¿QUIERES CONTINUAR?</text>
+        <view class="price-badge">$0.01 MXN</view>
+      </view>
+      <text class="modal-desc">¡No te rindas! Paga un centavo para obtener 15 segundos extra de tiempo y seguir luchando contra Tokat.</text>
+      
+      <view class="modal-actions">
+        <toka-button variant="primary" onClick="onContinuePay" fullWidth className="modal-spacing">
+          PAGAR Y CONTINUAR
+        </toka-button>
+        <toka-button variant="outline" onClick="onCancelContinue" fullWidth>
+          No, terminar juego
+        </toka-button>
+      </view>
+    </view>
+  </view>
+
+  <view style="position: absolute; width: 0; height: 0; overflow: hidden; opacity: 0;">
+    <image a:for="{{allFrames}}" a:key="*this" src="{{item}}" />
+  </view>
+</view>
+

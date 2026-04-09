@@ -1,0 +1,89 @@
+<view class="page">
+  <view a:if="{{!showStartButton}}" class="pause-button-top" onTap="togglePause">⏸</view>
+
+  <game-header 
+    title="TOKAT SAYS"
+    score="{{tokensEarned}}"
+    scoreLabel="TOKENS"
+    progress="{{timerPercent}}"
+    progressColor="{{timerColor}}"
+  />
+
+  <view class="game-content">
+    <view class="tokat-box" style="border-color: {{tokatBorderColor}};">
+      <view class="tokat-label">TOKAT</view>
+      
+      <!-- Animación de Tokat -->
+      <view class="tokat-stage">
+        <image class="tokat-sprite" src="{{tokatSprite}}" mode="aspectFit" />
+      </view>
+
+      <!-- Flecha/Gestor -->
+      <view class="tokat-gesture" style="color: {{tokatGestureColor}};">{{tokatGestureText}}</view>
+    </view>
+
+    <view class="status-text" style="color: {{statusColor}};">{{statusText}}</view>
+    <view class="round-indicator">Ronda: {{round}}</view>
+
+    <view class="start-card" a:if="{{showStartButton}}">
+      <toka-button onClick="startGame" fullWidth>EMPEZAR JUEGO</toka-button>
+    </view>
+
+    <view class="controls">
+      <view class="pad">
+        <view class="gesture-btn up" style="opacity: {{upOpacity}};" data-gesture="↑" onTap="onGestureTap">↑</view>
+        <view class="gesture-btn left" style="opacity: {{leftOpacity}};" data-gesture="←" onTap="onGestureTap">←</view>
+        <view class="gesture-btn right" style="opacity: {{rightOpacity}};" data-gesture="→" onTap="onGestureTap">→</view>
+        <view class="gesture-btn down" style="opacity: {{downOpacity}};" data-gesture="↓" onTap="onGestureTap">↓</view>
+
+        <view
+          a:if="{{showTapButton}}"
+          class="gesture-btn tap"
+          style="opacity: {{tapOpacity}};"
+          data-gesture="✦"
+          onTap="onGestureTap"
+        >
+          ✦
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Pause Overlay -->
+  <view a:if="{{isPaused}}" class="modal-overlay">
+    <view class="modal-card">
+      <text class="modal-title">JUEGO EN PAUSA</text>
+      <toka-button variant="primary" onClick="togglePause" fullWidth className="modal-spacing">Continuar</toka-button>
+      <toka-button variant="outline" onClick="exitGame" fullWidth>Salir</toka-button>
+    </view>
+  </view>
+
+  <!-- Countdown Overlay -->
+  <view a:if="{{isCountingDown}}" class="modal-overlay countdown-overlay">
+    <text class="countdown-number">{{countdownText}}</text>
+  </view>
+
+  <!-- Pay to Continue Modal -->
+  <view a:if="{{showContinueModal}}" class="modal-overlay">
+    <view class="modal-card">
+      <view class="modal-header">
+        <text class="modal-title">¿QUIERES CONTINUAR?</text>
+        <view class="price-badge">$0.01 MXN</view>
+      </view>
+      <text class="modal-desc">No detengas tu racha. Paga un centavo para generar una nueva secuencia en esta misma ronda y seguir sumando tokens.</text>
+      
+      <view class="modal-actions">
+        <toka-button variant="primary" onClick="onContinuePay" fullWidth className="modal-spacing">
+          PAGAR Y CONTINUAR
+        </toka-button>
+        <toka-button variant="outline" onClick="onCancelContinue" fullWidth>
+          No, terminar juego
+        </toka-button>
+      </view>
+    </view>
+  </view>
+
+  <view style="position: absolute; width: 0; height: 0; overflow: hidden; opacity: 0;">
+    <image a:for="{{allFrames}}" a:key="*this" src="{{item}}" />
+  </view>
+</view>

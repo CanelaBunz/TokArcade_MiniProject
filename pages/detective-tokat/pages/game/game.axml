@@ -1,0 +1,123 @@
+<view class="page">
+  <view class="pause-button-top" onTap="togglePause">⏸</view>
+
+  <game-header 
+    title="DETECTIVE TOKAT"
+    score="{{score}}"
+    scoreLabel="PUNTOS"
+    progress="{{(timerSeconds / 30) * 100}}"
+    progressColor="{{timerColor}}"
+  />
+
+  <view class="game-content">
+    <view class="sub-hud">
+      <view class="counter">{{counterText}}</view>
+      <view a:if="{{showLives}}" class="lives">{{livesText}}</view>
+    </view>
+
+    <view class="category-badge">{{categoryLabel}}</view>
+
+    <view class="scene-card">
+      <!-- Walking Phase -->
+      <view a:if="{{phase === 'walk'}}" class="walk-phase">
+        <view class="walk-icon">🚶</view>
+        <view class="walk-title">Tokat avanza por el corredor...</view>
+      </view>
+
+      <!-- Question Phase -->
+      <view a:if="{{phase === 'question'}}" class="question-phase">
+        <view class="paper-area">
+          <view class="paper-icon {{paperPulse ? 'pulse' : ''}}" onTap="tapPaper">📄</view>
+          <view class="paper-hint">Inspecciona la nota</view>
+        </view>
+
+        <!-- The Scratchable Box -->
+        <view class="scratch-box" id="scratchContainer"
+              catchTouchStart="onTorchStart" 
+              catchTouchMove="onTorchMove" 
+              catchTouchEnd="onTorchEnd">
+          
+          <view class="question-layer">
+            <view class="question-title">Mensaje de la Sombra</view>
+            <view class="question-text">{{questionText}}</view>
+          </view>
+
+          <view class="darkness-layer" 
+                style="mask-image: conic-gradient(from 330deg at {{torchX}}px {{torchY}}px, transparent 0deg 60deg, black 60deg); 
+                       -webkit-mask-image: conic-gradient(from 330deg at {{torchX}}px {{torchY}}px, transparent 0deg 60deg, black 60deg);">
+            <view class="darkness-pattern">?</view>
+          </view>
+
+          <view class="floating-torch" 
+                style="left: {{torchX}}px; top: {{torchY}}px; opacity: {{torchActive ? 1 : 0.7}};">
+            🔦
+            <view class="torch-glow"></view>
+          </view>
+        </view>
+
+        <view class="tools">
+          <view class="tool-instruction">"Raspa" el misterio con la linterna 🔦</view>
+          <view class="tool lens {{lensActive ? 'active' : ''}}" onTap="toggleLens">🔍 Lupa</view>
+        </view>
+      </view>
+
+      <!-- Result Phase -->
+      <view a:if="{{phase === 'result'}}" class="result-phase">
+        <view class="feedback" style="color: {{feedbackColor}};">{{feedbackText}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Options Overlay -->
+  <view a:if="{{showOptionsOverlay}}" class="modal-overlay">
+    <view class="modal-card">
+      <view class="modal-title">🔍 Elige una respuesta</view>
+      <view class="options-grid">
+        <view a:for="{{currentOptions}}" a:for-index="idx"
+              class="opt {{selectedOption === idx ? 'selected' : ''}}"
+              data-index="{{idx}}"
+              onTap="selectOption">
+          {{item}}
+        </view>
+      </view>
+      <toka-button 
+        variant="{{selectedOption === -1 ? 'secondary' : 'primary'}}" 
+        onClick="confirmAnswer" 
+        fullWidth 
+        disabled="{{selectedOption === -1}}"
+      >
+        Confirmar
+      </toka-button>
+    </view>
+  </view>
+
+  <!-- Tutorial -->
+  <view a:if="{{showTutorial}}" class="modal-overlay">
+    <view class="modal-card tutorial-card">
+      <view class="modal-title">¿Cómo investigar?</view>
+      <view class="tutorial-step">🔦 Arrastra la linterna para "raspar" el cuadro oscuro.</view>
+      <view class="tutorial-step">🔍 Activa la lupa y toca el papel 📄 para revelar respuestas.</view>
+      <toka-button onClick="closeTutorial" fullWidth>¡Entendido!</toka-button>
+    </view>
+  </view>
+
+  <!-- Pay to Continue Modal -->
+  <view a:if="{{showContinueModal}}" class="modal-overlay">
+    <view class="modal-card">
+      <view class="modal-header">
+        <text class="modal-title">¿QUIERES CONTINUAR?</text>
+        <view class="price-badge">$0.01 MXN</view>
+      </view>
+      <text class="modal-desc">El misterio no se resuelve solo. Paga un centavo para recuperar una vida y seguir tras la pista de las sombras.</text>
+      
+      <view class="modal-actions">
+        <toka-button variant="primary" onClick="onContinuePay" fullWidth className="modal-spacing">
+          PAGAR Y CONTINUAR
+        </toka-button>
+        <toka-button variant="outline" onClick="onCancelContinue" fullWidth>
+          No, terminar juego
+        </toka-button>
+      </view>
+    </view>
+  </view>
+</view>

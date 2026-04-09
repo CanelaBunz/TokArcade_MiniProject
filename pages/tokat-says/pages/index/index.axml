@@ -1,0 +1,14 @@
+<view class="page">
+  <view class="title">TOKAT SAYS</view>
+
+  <view class="subtitle">Toka Rhythm</view>
+
+  <view class="description">
+    Memoriza con precisión la secuencia de gestos que muestra Tokat y repítelos en el mismo orden para avanzar. A medida que superes las rondas, el desafío aumentará con límites de tiempo reducidos y nuevos controles táctiles que pondrán a prueba tus reflejos y concentración.
+  </view>
+
+  <view class="play-button" onTap="startGame">
+    JUGAR
+  </view>
+  <view class="leaderboard-btn" onTap="onLeaderboard">Ranking</view>
+</view>

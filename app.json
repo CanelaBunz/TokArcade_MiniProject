@@ -3,14 +3,16 @@
     "pages/menu/menu",
     "pages/tienda/tienda",
     "pages/perfil/perfil",
-    "pages/prejuego/prejuego",
-    "pages/juego/juego",
-    "tokaRythm/tokaRhytm/pages/index/index",
-    "tokaRythm/tokaRhytm/pages/game/game",
-    "tokaRythm/tokaRhytm/pages/end/end",
-    "detectivetokat/tokaDetective/pages/index/index",
-    "detectivetokat/tokaDetective/pages/game/game",
-    "detectivetokat/tokaDetective/pages/end/end"
+    "pages/leaderboard/leaderboard",
+    "pages/tokaRPS/pages/index/index",
+    "pages/tokaRPS/pages/game/game",
+    "pages/tokaRPS/pages/end/end",
+    "pages/tokat-says/pages/index/index",
+    "pages/tokat-says/pages/game/game",
+    "pages/tokat-says/pages/end/end",
+    "pages/detective-tokat/pages/index/index",
+    "pages/detective-tokat/pages/game/game",
+    "pages/detective-tokat/pages/end/end"
   ],
   "window": {
     "defaultTitle": "TokArcade",
@@ -26,20 +28,20 @@
       {
         "pagePath": "pages/tienda/tienda",
         "name": "Tienda",
-        "icon": "/images/icon_tienda.png",
-        "activeIcon": "/images/icon_tienda_active.png"
+        "icon": "images/icon_tienda.png",
+        "activeIcon": "images/icon_tienda_active.png"
       },
       {
         "pagePath": "pages/menu/menu",
         "name": "Inicio",
-        "icon": "/images/icon_home.png",
-        "activeIcon": "/images/icon_home_active.png"
+        "icon": "images/icon_home.png",
+        "activeIcon": "images/icon_home_active.png"
       },
       {
         "pagePath": "pages/perfil/perfil",
         "name": "Perfil",
-        "icon": "/images/icon_perfil.png",
-        "activeIcon": "/images/icon_perfil_active.png"
+        "icon": "images/icon_perfil.png",
+        "activeIcon": "images/icon_perfil_active.png"
       }
     ]
   }

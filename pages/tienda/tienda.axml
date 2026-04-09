@@ -8,7 +8,7 @@
     <view class="brands-grid">
       <view class="brand-item" a:for="{{marcas}}" a:key="id" onTap="onTapMarca" data-id="{{item.id}}">
         <view class="brand-circle" style="background-color: {{item.color}}">
-          <!-- Logo de la empresa (placeholder si no existe) -->
+          <!-- Logo de la empresa -->
           <image class="brand-logo" src="{{item.logo}}" mode="aspectFit" />
         </view>
         <text class="brand-name">{{item.nombre}}</text>
@@ -16,8 +16,8 @@
     </view>
   </view>
 
-  <!-- Modal Kiosco (Tiendita) -->
-  <view class="modal-overlay {{showKiosco ? 'modal-active' : ''}}" a:if="{{showKiosco}}">
+  <!-- Modal Kiosco (Tiendita) — clase renombrada para evitar conflicto CSS -->
+  <view class="tienda-modal-overlay" a:if="{{showKiosco}}">
     <view class="kiosco-card">
       
       <!-- Techo del Kiosco -->
@@ -33,9 +33,19 @@
 
         <!-- Interior del Kiosco: Estantes -->
         <view class="kiosco-interior">
-          <view class="kiosco-estante" a:for="{{[1,2]}}" a:key="*this">
+          <view class="kiosco-estante">
             <view class="kiosco-productos">
-               <view class="producto-placeholder" a:for="{{[1,2,3]}}" a:key="*this"></view>
+               <view 
+                 class="producto-cupon" 
+                 a:for="{{selectedMarca.cupones}}" 
+                 a:key="id"
+                 onLongTap="onLongTapCupon"
+                 onTap="onTapCupon"
+                 data-cupon="{{item}}"
+               >
+                 <text class="cupon-tipo">{{item.tipo}}</text>
+                 <view class="cupon-precio-badge">{{item.precio}} pts</view>
+               </view>
             </view>
             <view class="kiosco-tabla"></view>
           </view>
@@ -48,5 +58,38 @@
 
     </view>
   </view>
-</view>
+  <!-- Modal Info Cupon -->
+  <view class="tienda-modal-overlay" a:if="{{selectedCupon}}">
+    <view class="info-card">
+      <view class="info-header">{{selectedCupon.tipo}}</view>
+      <text class="info-desc">{{selectedCupon.desc}}</text>
+      <toka-button variant="outline" onClick="onCloseCuponInfo" fullWidth>Cerrar</toka-button>
+    </view>
+  </view>
+
+  <!-- Modal Carrito -->
+  <view class="tienda-modal-overlay" a:if="{{showCartModal}}">
+    <view class="cart-card">
+      <view class="cart-header">
+        <text class="cart-title">Tu Carrito</text>
+        <view class="btn-cerrar" onTap="onCloseCart">X</view>
+      </view>
+      <scroll-view scroll-y class="cart-items">
+        <view class="cart-item" a:for="{{cart}}" a:key="idCarrito">
+          <text class="item-name">{{item.marcaNombre}} - {{item.tipo}}</text>
+          <text class="item-price">{{item.precio}} pts</text>
+        </view>
+      </scroll-view>
+      <view class="cart-footer">
+        <text class="cart-total">Total: {{cartTotal}} pts</text>
+        <toka-button variant="primary" onClick="onCheckout" fullWidth>Canjear Todo</toka-button>
+      </view>
+    </view>
+  </view>
+
+  <!-- Floating Cart Button -->
+  <view class="cart-btn" onTap="onOpenCart" a:if="{{!showKiosco}}">
+    <text class="cart-icon">🛒</text>
+    <view class="cart-badge" a:if="{{cart.length > 0}}">{{cart.length}}</view>
+  </view>
 </view>
