@@ -203,26 +203,28 @@ Page({
 
   getFairBeatWindow() {
     const round = this.data.roundCount;
-    const progress = Math.min(round / 18, 1);
+    const progress = Math.min(round / 26, 1);
     const eased = progress * progress * (3 - 2 * progress);
 
-    const beat = Math.round(680 + (460 - 680) * eased);
-    const choiceWindow = Math.round(840 + (620 - 840) * eased);
+    const beat = Math.round(780 + (600 - 780) * eased);
+    const choiceWindow = Math.round(950 + (760 - 950) * eased);
+    const leadIn = Math.round(260 + (180 - 260) * eased);
 
     let paceLabel = 'Suave';
-    if (progress >= 0.66) {
+    if (progress >= 0.8) {
       paceLabel = 'Rápido';
-    } else if (progress >= 0.33) {
+    } else if (progress >= 0.45) {
       paceLabel = 'Medio';
     }
 
-    return { beat, choiceWindow, paceLabel };
+    return { beat, choiceWindow, leadIn, paceLabel };
   },
 
   getNextExchangeDelay() {
     const round = this.data.roundCount;
-    const progress = Math.min(round / 18, 1);
-    return Math.round(760 + (520 - 760) * progress);
+    const progress = Math.min(round / 26, 1);
+    const eased = progress * progress * (3 - 2 * progress);
+    return Math.round(980 + (760 - 980) * eased);
   },
 
   startGame() {
@@ -237,8 +239,8 @@ Page({
       drawStreakCount: 0,
       roundCount: 0,
       paceLabel: 'Suave',
-      helperText: 'Escucha el ritmo',
-      helperColor: '#8ec5ff',
+      helperText: 'Respira, el ritmo va a empezar',
+      helperColor: '#a29bfe',
       canChoose: false,
       roundResolved: false,
       gameEnded: false,
@@ -251,10 +253,10 @@ Page({
       progressPercent: 0,
       progressColor: '#74b9ff',
       tokatFrame: '/images/tokat/frame0000.png',
-      tokatStateText: 'Preparado',
-      rhythmText: 'Prepárate...',
+      tokatStateText: 'Tokat se prepara',
+      rhythmText: 'Listo...',
       rhythmColor: '#ffffff',
-      resultText: 'Espera a "TIJERAS"',
+      resultText: 'Primero observa el ritmo',
       enemyChoiceText: '',
       isPaused: false,
       isCountingDown: false,
@@ -264,11 +266,12 @@ Page({
     this.updateDrawCounter();
     this.updateProgressBar();
     this.playTokatAnimation('idle');
-    this.startGlobalTimer();
 
     this.nextExchangeTimer = setTimeout(() => {
+      if (this.data.gameEnded || this.data.isPaused || this.data.isCountingDown || this.data.showTutorialModal) return;
+      this.startGlobalTimer();
       this.startExchange();
-    }, 700);
+    }, 1800);
   },
 
   startGlobalTimer() {
@@ -351,6 +354,7 @@ Page({
     const timing = this.getFairBeatWindow();
     const beat = timing.beat;
     const choiceWindow = timing.choiceWindow;
+    const leadIn = timing.leadIn;
 
     this.setData({
       roundCount: nextRound,
@@ -359,11 +363,11 @@ Page({
       canChoose: false,
       roundResolved: false,
       inputLocked: false,
-      helperText: 'Aún no toques',
+      helperText: 'Todavía no, entra en el ritmo',
       helperColor: '#8ec5ff',
       resultText: 'Espera a "TIJERAS"',
       enemyChoiceText: '',
-      rhythmText: 'Prepárate...',
+      rhythmText: 'Escucha...',
       rhythmColor: '#ffffff',
       tokatStateText: 'Sigue el ritmo'
     });
@@ -403,13 +407,13 @@ Page({
         }
 
         this.setData(payload);
-      }, beat * index);
+      }, leadIn + (beat * index));
     });
 
     this.choiceWindowTimer = setTimeout(() => {
       if (!this.isRoundValid(token)) return;
       this.handleTimeout();
-    }, beat * 3 + choiceWindow);
+    }, leadIn + (beat * 3) + choiceWindow);
   },
 
   onChoiceTap(e) {
@@ -456,7 +460,7 @@ Page({
     }, 200);
 
     this.updateDrawCounter();
-    this.queueNextExchange(this.getNextExchangeDelay() + 300);
+    this.queueNextExchange(this.getNextExchangeDelay() + 500);
   },
 
   handlePlayerChoice(choice) {
@@ -539,7 +543,7 @@ Page({
       return;
     }
 
-    this.queueNextExchange(this.getNextExchangeDelay() + 300);
+    this.queueNextExchange(this.getNextExchangeDelay() + 380);
   },
 
   handleTimeout() {
@@ -569,7 +573,7 @@ Page({
     }, 200);
 
     this.updateDrawCounter();
-    this.queueNextExchange(this.getNextExchangeDelay() + 300);
+    this.queueNextExchange(this.getNextExchangeDelay() + 520);
   },
 
   queueNextExchange(delay) {
