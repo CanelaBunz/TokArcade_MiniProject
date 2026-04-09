@@ -27,13 +27,13 @@ Page({
 
   retryGame() {
     my.redirectTo({
-      url: '/pages/tokaRPS/pages/game/game'
+      url: '/pages/tokaRPS/pages/game/game?skipTutorial=1'
     });
   },
 
   goMenu() {
     my.redirectTo({
-      url: '/pages/menu/menu'
+      url: '/pages/tokaRPS/pages/index/index'
     });
   }
 });

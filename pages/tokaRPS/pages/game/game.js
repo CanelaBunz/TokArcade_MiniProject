@@ -5,26 +5,6 @@ import { SaveGameStatsUseCase } from '../../../../src/core/application/game/Save
 const statsRepository = new LocalStorageGameStatsRepository();
 const saveStatsUseCase = new SaveGameStatsUseCase(statsRepository);
 
-// ─── Rutas de assets ─────────────────────────────────────────────────────────
-const BASE = '/images/tokat/';
-
-const FRAMES = {
-  idle:  [0,1,2,3,4,5,6].map(i => `${BASE}frame${String(i).padStart(4,'0')}.png`),
-  ready: [0,1,2,3,4,5].map(i   => `${BASE}TK${String(i).padStart(4,'0')}.png`),
-  beatP: [0,1,2,3,4,5,6].map(i => `${BASE}TBP${String(i).padStart(4,'0')}.png`),
-  beatPa:[0,1,2,3].map(i        => `${BASE}TBPa${String(i).padStart(4,'0')}.png`),
-  beatO: [0,1,2,3,4,5,6].map(i => `${BASE}TBO${String(i).padStart(4,'0')}.png`),
-  scissors: [`${BASE}TR0000.png`, `${BASE}TR0001.png`, `${BASE}TR0002.png`],
-  paper:    [`${BASE}TR1`],   // TR1 (solo un frame para papel)
-  rock:     [`${BASE}TK2`],   // TK2 (solo un frame para piedra)
-  lose: [0,1,2,3,4,5].map(i  => `${BASE}TL1${String(i).padStart(4,'0')}.png`),
-  win:  [0,1,2,3,4,5,6].map(i=> `${BASE}TW${String(i).padStart(4,'0')}.png`),
-};
-
-// Verifica extensiones de los frames únicos
-FRAMES.paper   = [`${BASE}TR1.png`];
-FRAMES.rock    = [`${BASE}TK2.png`];
-
 Page({
   data: {
     totalTime: 50000,
@@ -36,6 +16,11 @@ Page({
     drawStreakCount: 0,
     drawStreakGoal: 4,
 
+    roundCount: 0,
+    paceLabel: 'Suave',
+    helperText: 'Escucha el ritmo',
+    helperColor: '#8ec5ff',
+
     canChoose: false,
     roundResolved: false,
     gameEnded: false,
@@ -43,143 +28,202 @@ Page({
 
     roundToken: 0,
 
-    timeText: "Tiempo: 50.0",
-    timeColor: "#ffffff",
+    timeText: 'Tiempo: 50.0',
+    timeColor: '#ffffff',
 
-    drawCounterText: "Empates: 0/4",
-    drawCounterColor: "#dfe6e9",
+    drawCounterText: 'Empates: 0/4',
+    drawCounterColor: '#dfe6e9',
 
     progressPercent: 0,
-    progressColor: "#74b9ff",
+    progressColor: '#74b9ff',
 
-    rhythmText: "Prepárate...",
-    rhythmColor: "#ffffff",
+    tokatFrame: '/images/tokat/frame0000.png',
+    tokatStateText: 'Preparado',
+
+    rhythmText: 'Prepárate...',
+    rhythmColor: '#ffffff',
 
     resultText: 'Espera a "TIJERAS"',
-    enemyChoiceText: "",
+    enemyChoiceText: '',
 
     isPaused: false,
     isCountingDown: false,
-    countdownText: "",
-
-    // ── Tokat sprite ──
-    tokatFrame: FRAMES.idle[0],
+    countdownText: '',
+    showTutorialModal: false
   },
 
-  onLoad() {
+  onLoad(query) {
     this.game = new TokaRpsGame();
 
     this.wordTimers = [];
     this.choiceWindowTimer = null;
     this.nextExchangeTimer = null;
     this.globalTimer = null;
+    this.countdownInterval = null;
 
-    // Animación interna de Tokat
-    this._animTimer  = null;  // setInterval para animaciones en bucle
-    this._animQueue  = null;  // setTimeout para animaciones de un solo ciclo
+    this.tokatAnimationTimer = null;
+    this.tokatAnimations = this.buildTokatAnimations();
 
-    this.startGame();
+    this.playTokatAnimation('idle');
+
+    if (query && query.skipTutorial === '1') {
+      this.startGame();
+    } else {
+      this.setData({
+        showTutorialModal: true,
+        rhythmText: 'Tutorial',
+        resultText: 'Aprende el ritmo antes de empezar',
+        helperText: 'Solo toca cuando aparezca ¡TIJERAS!',
+        helperColor: '#55efc4',
+        tokatStateText: 'Tokat te enseña el ritmo'
+      });
+    }
   },
 
   onUnload() {
     this.cleanupScene();
   },
 
-  // ─── Animación de Tokat ─────────────────────────────────────────────────────
+  buildTokatAnimations() {
+    const base = '/images/tokat';
 
-  /**
-   * Reproduce una animación en bucle continuo.
-   * @param {string[]} frames  Array de rutas
-   * @param {number}   fps     Cuadros por segundo
-   */
-  _loopAnim(frames, fps) {
-    this._stopAnim();
-    let pointer = 0;
-    const delay = Math.floor(1000 / fps);
-    // Secuencia ping-pong suave para animaciones idle/ready
-    const seq = [...frames, ...[...frames].reverse().slice(1, -1)];
-
-    this.setData({ tokatFrame: seq[0] });
-
-    this._animTimer = setInterval(() => {
-      pointer = (pointer + 1) % seq.length;
-      this.setData({ tokatFrame: seq[pointer] });
-    }, delay);
-  },
-
-  /**
-   * Reproduce una animación una sola vez de principio a fin,
-   * luego llama onDone().
-   * @param {string[]} frames
-   * @param {number}   totalDuration  ms totales para toda la animación
-   * @param {Function} [onDone]
-   */
-  _onceAnim(frames, totalDuration, onDone) {
-    this._stopAnim();
-    if (!frames || frames.length === 0) {
-      if (onDone) onDone();
-      return;
-    }
-
-    const delay = Math.floor(totalDuration / frames.length);
-    let pointer = 0;
-
-    this.setData({ tokatFrame: frames[0] });
-
-    const tick = () => {
-      pointer++;
-      if (pointer < frames.length) {
-        this.setData({ tokatFrame: frames[pointer] });
-        this._animQueue = setTimeout(tick, delay);
-      } else {
-        if (onDone) onDone();
+    const range = (prefix, count, startAt = 0, padLength = 4) => {
+      const frames = [];
+      for (let i = startAt; i < startAt + count; i += 1) {
+        frames.push(`${base}/${prefix}${String(i).padStart(padLength, '0')}.png`);
       }
+      return frames;
     };
 
-    this._animQueue = setTimeout(tick, delay);
-  },
-
-  /**
-   * Reproduce N cuadros distribuidos exactamente en totalDuration ms,
-   * luego llama onDone().
-   */
-  _timedAnim(frames, totalDuration, onDone) {
-    this._stopAnim();
-    if (!frames || frames.length === 0) {
-      if (onDone) onDone();
-      return;
-    }
-
-    const delay = Math.floor(totalDuration / frames.length);
-    let pointer = 0;
-
-    this.setData({ tokatFrame: frames[0] });
-
-    const advance = () => {
-      pointer++;
-      if (pointer < frames.length) {
-        this.setData({ tokatFrame: frames[pointer] });
-        this._animQueue = setTimeout(advance, delay);
-      } else {
-        if (onDone) onDone();
+    return {
+      idle: {
+        frames: range('frame', 7),
+        sequence: [0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1],
+        interval: 140
+      },
+      ready: {
+        frames: range('TK', 6),
+        sequence: [0, 1, 2, 3, 4, 5],
+        interval: 95
+      },
+      beat_rock: {
+        frames: range('TBP', 7),
+        sequence: [0, 1, 2, 3, 4, 5, 6],
+        interval: 90
+      },
+      beat_paper: {
+        frames: range('TBPa', 4),
+        sequence: [0, 1, 2, 3],
+        interval: 90
+      },
+      beat_o: {
+        frames: range('TBO', 7),
+        sequence: [0, 1, 2, 3, 4, 5, 6],
+        interval: 90
+      },
+      win: { // Cuando Tokat gana
+        frames: range('TW', 7),
+        sequence: [0, 1, 2, 3, 4, 5, 6],
+        interval: 95
+      },
+      lose: { // Cuando Tokat pierde o hay empate
+        frames: [
+          `${base}/TL10000.png`,
+          `${base}/TL10001.png`,
+          `${base}/TL10002.png`,
+          `${base}/TL10003.png`,
+          `${base}/TL10004.png`,
+          `${base}/TL10005.png`
+        ],
+        sequence: [0, 1, 2, 3, 4, 5],
+        interval: 110
+      },
+      choice_scissors: {
+        frames: range('TR', 1, 0), // TR0000.png
+        sequence: [0],
+        interval: 1000
+      },
+      choice_paper: {
+        frames: range('TR', 1, 1), // TR0001.png
+        sequence: [0],
+        interval: 1000
+      },
+      choice_rock: {
+        frames: range('TR', 1, 2), // TR0002.png
+        sequence: [0],
+        interval: 1000
       }
     };
-
-    this._animQueue = setTimeout(advance, delay);
   },
 
-  _stopAnim() {
-    if (this._animTimer) {
-      clearInterval(this._animTimer);
-      this._animTimer = null;
-    }
-    if (this._animQueue) {
-      clearTimeout(this._animQueue);
-      this._animQueue = null;
+  playTokatAnimation(name, options = {}) {
+    const animation = this.tokatAnimations[name] || this.tokatAnimations.idle;
+    const once = !!options.once;
+    const fallback = options.fallback !== undefined ? options.fallback : 'idle';
+    const interval = options.duration ? Math.max(20, Math.floor(options.duration / animation.sequence.length)) : animation.interval;
+
+    this.stopTokatAnimation();
+
+    let pointer = 0;
+    const firstIndex = animation.sequence[0] || 0;
+    this.setData({ tokatFrame: animation.frames[firstIndex] });
+
+    if (animation.sequence.length > 1) {
+      this.tokatAnimationTimer = setInterval(() => {
+        pointer += 1;
+
+        if (pointer >= animation.sequence.length) {
+          if (once) {
+            this.stopTokatAnimation();
+            if (fallback) {
+              this.playTokatAnimation(fallback);
+            }
+            return;
+          }
+          pointer = 0;
+        }
+
+        const frameIndex = animation.sequence[pointer];
+        this.setData({ tokatFrame: animation.frames[frameIndex] });
+      }, interval);
     }
   },
 
-  // ─── Lógica del juego ───────────────────────────────────────────────────────
+  stopTokatAnimation() {
+    if (this.tokatAnimationTimer) {
+      clearInterval(this.tokatAnimationTimer);
+      this.tokatAnimationTimer = null;
+    }
+  },
+
+  beginFromTutorial() {
+    this.setData({ showTutorialModal: false });
+    this.startGame();
+  },
+
+  getFairBeatWindow() {
+    const round = this.data.roundCount;
+    const progress = Math.min(round / 18, 1);
+    const eased = progress * progress * (3 - 2 * progress);
+
+    const beat = Math.round(680 + (460 - 680) * eased);
+    const choiceWindow = Math.round(840 + (620 - 840) * eased);
+
+    let paceLabel = 'Suave';
+    if (progress >= 0.66) {
+      paceLabel = 'Rápido';
+    } else if (progress >= 0.33) {
+      paceLabel = 'Medio';
+    }
+
+    return { beat, choiceWindow, paceLabel };
+  },
+
+  getNextExchangeDelay() {
+    const round = this.data.roundCount;
+    const progress = Math.min(round / 18, 1);
+    return Math.round(760 + (520 - 760) * progress);
+  },
 
   startGame() {
     this.clearRoundTimers();
@@ -191,37 +235,46 @@ Page({
       remainingTime: 50000,
       progress: 0,
       drawStreakCount: 0,
+      roundCount: 0,
+      paceLabel: 'Suave',
+      helperText: 'Escucha el ritmo',
+      helperColor: '#8ec5ff',
       canChoose: false,
       roundResolved: false,
       gameEnded: false,
       inputLocked: false,
       roundToken: 0,
-      timeText: "Tiempo: 50.0",
-      timeColor: "#ffffff",
-      drawCounterText: "Empates: 0/4",
-      drawCounterColor: "#dfe6e9",
+      timeText: 'Tiempo: 50.0',
+      timeColor: '#ffffff',
+      drawCounterText: 'Empates: 0/4',
+      drawCounterColor: '#dfe6e9',
       progressPercent: 0,
-      progressColor: "#74b9ff",
-      rhythmText: "Prepárate...",
-      rhythmColor: "#ffffff",
+      progressColor: '#74b9ff',
+      tokatFrame: '/images/tokat/frame0000.png',
+      tokatStateText: 'Preparado',
+      rhythmText: 'Prepárate...',
+      rhythmColor: '#ffffff',
       resultText: 'Espera a "TIJERAS"',
-      enemyChoiceText: ""
+      enemyChoiceText: '',
+      isPaused: false,
+      isCountingDown: false,
+      countdownText: ''
     });
 
     this.updateDrawCounter();
     this.updateProgressBar();
+    this.playTokatAnimation('idle');
+    this.startGlobalTimer();
 
-    // Animación "ready" (TK) antes de iniciar el primer beat
-    this._onceAnim(FRAMES.ready, 800, () => {
-      this.startGlobalTimer();
+    this.nextExchangeTimer = setTimeout(() => {
       this.startExchange();
-    });
+    }, 700);
   },
 
   startGlobalTimer() {
     this.clearGlobalTimer();
     this.globalTimer = setInterval(() => {
-      if (this.data.gameEnded || this.data.isPaused || this.data.isCountingDown) return;
+      if (this.data.gameEnded || this.data.isPaused || this.data.isCountingDown || this.data.showTutorialModal) return;
 
       const remaining = this.game.tickRemainingTime(100);
 
@@ -244,14 +297,17 @@ Page({
   updateTimeLabel() {
     const seconds = (this.data.remainingTime / 1000).toFixed(1);
 
-    let color = "#ffffff";
+    let color = '#ffffff';
     if (this.data.remainingTime <= 10000) {
-      color = "#ff7675";
+      color = '#ff7675';
     } else if (this.data.remainingTime <= 25000) {
-      color = "#ffd166";
+      color = '#ffd166';
     }
 
-    this.setData({ timeText: `Tiempo: ${seconds}`, timeColor: color });
+    this.setData({
+      timeText: `Tiempo: ${seconds}`,
+      timeColor: color
+    });
   },
 
   updateDrawCounter() {
@@ -259,21 +315,24 @@ Page({
 
     this.setData({
       drawCounterText: `Empates: ${this.data.drawStreakCount}/${this.data.drawStreakGoal}`,
-      drawCounterColor: nearGoal ? "#ffd166" : "#dfe6e9"
+      drawCounterColor: nearGoal ? '#ffd166' : '#dfe6e9'
     });
   },
 
   updateProgressBar() {
     const percent = (this.data.progress / this.data.maxProgress) * 100;
 
-    let color = "#74b9ff";
+    let color = '#74b9ff';
     if (this.data.progress >= 100) {
-      color = "#00cec9";
+      color = '#00cec9';
     } else if (this.data.progress >= 50) {
-      color = "#55efc4";
+      color = '#55efc4';
     }
 
-    this.setData({ progressPercent: percent, progressColor: color });
+    this.setData({
+      progressPercent: percent,
+      progressColor: color
+    });
   },
 
   isRoundValid(token) {
@@ -283,66 +342,70 @@ Page({
   },
 
   startExchange() {
-    if (this.data.gameEnded || this.data.isPaused || this.data.isCountingDown) return;
+    if (this.data.gameEnded || this.data.isPaused || this.data.isCountingDown || this.data.showTutorialModal) return;
 
     this.clearRoundTimers();
 
     const token = this.data.roundToken + 1;
+    const nextRound = this.data.roundCount + 1;
+    const timing = this.getFairBeatWindow();
+    const beat = timing.beat;
+    const choiceWindow = timing.choiceWindow;
+
     this.setData({
+      roundCount: nextRound,
+      paceLabel: timing.paceLabel,
       roundToken: token,
       canChoose: false,
       roundResolved: false,
       inputLocked: false,
+      helperText: 'Aún no toques',
+      helperColor: '#8ec5ff',
       resultText: 'Espera a "TIJERAS"',
-      enemyChoiceText: "",
-      rhythmText: "Prepárate...",
-      rhythmColor: "#ffffff"
+      enemyChoiceText: '',
+      rhythmText: 'Prepárate...',
+      rhythmColor: '#ffffff',
+      tokatStateText: 'Sigue el ritmo'
     });
 
-    const { beat, choiceWindow } = this.game.getBeatWindow();
+    this.playTokatAnimation('ready');
 
-    // ── Animaciones sincronizadas con beat ─────────────────────────────────
-    // Palabra 0: PIEDRA  → animación TBP (beat ms)
-    // Palabra 1: PAPEL   → animación TBPa (beat ms)
-    // Palabra 2: O...    → animación TBO  (beat ms)
-    // Palabra 3: TIJERAS → ventana de elección (choiceWindow ms)
+    const words = [
+      { text: 'PIEDRA', color: '#2ecc71' },
+      { text: 'PAPEL', color: '#f39c12' },
+      { text: 'O...', color: '#f1c40f' },
+      { text: '¡TIJERAS!', color: '#e74c3c' }
+    ];
 
-    // PIEDRA
-    this.wordTimers.push(setTimeout(() => {
-      if (!this.isRoundValid(token)) return;
-      this.setData({ rhythmText: "PIEDRA", rhythmColor: "#2ecc71" });
-      this._timedAnim(FRAMES.beatP, beat);
-    }, 0));
+    this.wordTimers = words.map((word, index) => {
+      return setTimeout(() => {
+        if (!this.isRoundValid(token)) return;
 
-    // PAPEL
-    this.wordTimers.push(setTimeout(() => {
-      if (!this.isRoundValid(token)) return;
-      this.setData({ rhythmText: "PAPEL", rhythmColor: "#f39c12" });
-      this._timedAnim(FRAMES.beatPa, beat);
-    }, beat));
+        const payload = {
+          rhythmText: word.text,
+          rhythmColor: word.color
+        };
 
-    // O...
-    this.wordTimers.push(setTimeout(() => {
-      if (!this.isRoundValid(token)) return;
-      this.setData({ rhythmText: "O...", rhythmColor: "#f1c40f" });
-      this._timedAnim(FRAMES.beatO, beat);
-    }, beat * 2));
+        if (word.text === '¡TIJERAS!') {
+          payload.canChoose = true;
+          payload.inputLocked = false;
+          payload.resultText = '¡AHORA!';
+          payload.helperText = '¡Toca ahora!';
+          payload.helperColor = '#55efc4';
+          payload.tokatStateText = '¡Ahora!';
+          this.stopTokatAnimation(); // Wait for user choice
+        } else if (word.text === 'PIEDRA') {
+          this.playTokatAnimation('beat_rock', { once: true, duration: beat, fallback: null });
+        } else if (word.text === 'PAPEL') {
+          this.playTokatAnimation('beat_paper', { once: true, duration: beat, fallback: null });
+        } else if (word.text === 'O...') {
+          this.playTokatAnimation('beat_o', { once: true, duration: beat, fallback: null });
+        }
 
-    // ¡TIJERAS! → habilitar elección
-    this.wordTimers.push(setTimeout(() => {
-      if (!this.isRoundValid(token)) return;
-      this.setData({
-        rhythmText: "¡TIJERAS!",
-        rhythmColor: "#e74c3c",
-        canChoose: true,
-        inputLocked: false,
-        resultText: "¡AHORA!"
-      });
-      // Animación idle mientras espera la elección
-      this._loopAnim(FRAMES.idle, 7);
-    }, beat * 3));
+        this.setData(payload);
+      }, beat * index);
+    });
 
-    // Tiempo límite de elección
     this.choiceWindowTimer = setTimeout(() => {
       if (!this.isRoundValid(token)) return;
       this.handleTimeout();
@@ -352,7 +415,7 @@ Page({
   onChoiceTap(e) {
     const choice = e.currentTarget.dataset.choice;
 
-    if (this.data.gameEnded || this.data.roundResolved || this.data.inputLocked || this.data.isPaused || this.data.isCountingDown) {
+    if (this.data.gameEnded || this.data.roundResolved || this.data.inputLocked || this.data.isPaused || this.data.isCountingDown || this.data.showTutorialModal) {
       return;
     }
 
@@ -378,20 +441,22 @@ Page({
       inputLocked: true,
       roundToken: this.data.roundToken + 1,
       rhythmText: choice.toUpperCase(),
-      rhythmColor: "#ffffff",
-      resultText: "¡Te adelantaste!\nPerdiste por romper el ritmo",
+      rhythmColor: '#ffffff',
+      resultText: '¡Te adelantaste!\nPerdiste por romper el ritmo',
       enemyChoiceText: 'Solo puedes elegir en "TIJERAS"',
-      drawStreakCount: 0
+      helperText: 'Espera el siguiente ritmo',
+      helperColor: '#ffb199',
+      drawStreakCount: 0,
+      tokatStateText: 'Tokat te castigó'
     });
+
+    this.playTokatAnimation('choice_scissors', { once: true, fallback: null });
+    setTimeout(() => {
+      this.playTokatAnimation('win', { once: true, fallback: 'idle' });
+    }, 200);
 
     this.updateDrawCounter();
-
-    // Animación de pérdida/empate
-    this._onceAnim(FRAMES.lose, 600, () => {
-      this._loopAnim(FRAMES.idle, 7);
-    });
-
-    this.queueNextExchange(700);
+    this.queueNextExchange(this.getNextExchangeDelay() + 300);
   },
 
   handlePlayerChoice(choice) {
@@ -400,13 +465,13 @@ Page({
     this.clearRoundTimers();
 
     const tokatChoice = this.game.getTokatChoice();
-    const resultType  = this.game.evaluateRound(choice, tokatChoice);
-    const resultData  = this.game.handleResult(resultType);
+    const resultType = this.game.evaluateRound(choice, tokatChoice);
+    const resultData = this.game.handleResult(resultType);
 
-    let rhythmColor = "#ffffff";
-    if (choice === "Piedra")  rhythmColor = "#2ecc71";
-    if (choice === "Papel")   rhythmColor = "#f39c12";
-    if (choice === "Tijeras") rhythmColor = "#e74c3c";
+    let rhythmColor = '#ffffff';
+    if (choice === 'Piedra') rhythmColor = '#2ecc71';
+    if (choice === 'Papel') rhythmColor = '#f39c12';
+    if (choice === 'Tijeras') rhythmColor = '#e74c3c';
 
     this.setData({
       roundResolved: true,
@@ -420,51 +485,61 @@ Page({
       drawStreakCount: this.game.state.drawStreakCount
     });
 
-    // ── Frame de elección de Tokat ──────────────────────────────────────────
-    // Mostrar el frame de la jugada de Tokat brevemente
-    if (tokatChoice === "Tijeras") {
-      this._onceAnim(FRAMES.scissors, 400, () => this._loopAnim(FRAMES.idle, 7));
-    } else if (tokatChoice === "Papel") {
-      this._onceAnim(FRAMES.paper, 300, () => this._loopAnim(FRAMES.idle, 7));
+    if (resultData.status === 'WIN') {
+      this.setData({
+        resultText: '¡Ganaste!\nLa barra avanzó bastante',
+        helperText: 'Buen timing',
+        helperColor: '#55efc4',
+        tokatStateText: 'Tokat fue derrotado'
+      });
+    } else if (resultData.status === 'DRAW_CONVERTED') {
+      this.setData({
+        resultText: '¡4 empates!\nSe convirtió en avance de victoria',
+        helperText: 'Racha de empates completada',
+        helperColor: '#74b9ff',
+        tokatStateText: 'Empate con impulso'
+      });
+    } else if (resultData.status === 'DRAW') {
+      this.setData({
+        resultText: `¡Empate!\nAcumulas ${this.game.state.drawStreakCount}/${this.data.drawStreakGoal}`,
+        helperText: 'Los empates también ayudan',
+        helperColor: '#ffd166',
+        tokatStateText: 'Empate'
+      });
     } else {
-      this._onceAnim(FRAMES.rock, 300, () => this._loopAnim(FRAMES.idle, 7));
+      this.setData({
+        resultText: 'Perdiste...\nLa barra no avanzó',
+        helperText: 'No pasa nada, vuelve al ritmo',
+        helperColor: '#ffb199',
+        tokatStateText: 'Tokat celebró'
+      });
     }
 
-    if (resultData.status === "WIN") {
-      this.setData({
-        resultText: "¡Ganaste!\nLa barra avanzó bastante",
-      });
-      this._stopAnim();
-      this._onceAnim(FRAMES.win, 700, () => this._loopAnim(FRAMES.idle, 7));
-    } else if (resultData.status === "DRAW_CONVERTED") {
-      this.setData({
-        resultText: "¡4 empates!\nSe convirtió en avance de victoria",
-      });
-      this._stopAnim();
-      this._onceAnim(FRAMES.win, 700, () => this._loopAnim(FRAMES.idle, 7));
-    } else if (resultData.status === "DRAW") {
-      this.setData({
-        resultText: `¡Empate!\nAcumulas ${this.data.drawStreakCount}/${this.data.drawStreakGoal}`,
-      });
-      this._stopAnim();
-      this._onceAnim(FRAMES.lose, 600, () => this._loopAnim(FRAMES.idle, 7));
-    } else {
-      this.setData({
-        resultText: "Perdiste...\nLa barra no avanzó",
-      });
-      this._stopAnim();
-      this._onceAnim(FRAMES.lose, 600, () => this._loopAnim(FRAMES.idle, 7));
-    }
+    let tokatChoiceAnim = 'choice_scissors';
+    if (tokatChoice === 'Papel') tokatChoiceAnim = 'choice_paper';
+    if (tokatChoice === 'Piedra') tokatChoiceAnim = 'choice_rock';
+    
+    this.playTokatAnimation(tokatChoiceAnim, { once: true, fallback: null });
+
+    setTimeout(() => {
+      if (resultData.status === 'WIN' || resultData.status === 'DRAW_CONVERTED' || resultData.status === 'DRAW') {
+        this.playTokatAnimation('lose', { once: true, fallback: 'idle' });
+      } else {
+        this.playTokatAnimation('win', { once: true, fallback: 'idle' });
+      }
+    }, 200);
 
     this.updateDrawCounter();
     this.updateProgressBar();
 
     if (this.game.isMaxProgress()) {
-      this.nextExchangeTimer = setTimeout(() => { this.endGame(true); }, 700);
+      this.nextExchangeTimer = setTimeout(() => {
+        this.endGame(true);
+      }, 750);
       return;
     }
 
-    this.queueNextExchange(700);
+    this.queueNextExchange(this.getNextExchangeDelay() + 300);
   },
 
   handleTimeout() {
@@ -478,44 +553,46 @@ Page({
       canChoose: false,
       inputLocked: true,
       roundToken: this.data.roundToken + 1,
-      rhythmText: "¡TARDE!",
-      rhythmColor: "#ff7675",
+      rhythmText: '¡TARDE!',
+      rhythmColor: '#ff7675',
       resultText: 'No elegiste en "TIJERAS"\nLa barra no avanzó',
-      enemyChoiceText: "Tokat aprovechó tu retraso",
-      drawStreakCount: 0
+      enemyChoiceText: 'Tokat aprovechó tu retraso',
+      helperText: 'En la siguiente ronda toca un poco antes',
+      helperColor: '#ffb199',
+      drawStreakCount: 0,
+      tokatStateText: 'Tokat te arañó'
     });
 
+    this.playTokatAnimation('choice_scissors', { once: true, fallback: null });
+    setTimeout(() => {
+      this.playTokatAnimation('win', { once: true, fallback: 'idle' });
+    }, 200);
+
     this.updateDrawCounter();
-
-    this._stopAnim();
-    this._onceAnim(FRAMES.lose, 600, () => this._loopAnim(FRAMES.idle, 7));
-
-    this.queueNextExchange(550);
+    this.queueNextExchange(this.getNextExchangeDelay() + 300);
   },
 
   queueNextExchange(delay) {
     this.nextExchangeTimer = setTimeout(() => {
-      if (this.data.gameEnded || this.data.isPaused || this.data.isCountingDown) return;
-
-      // Animación "ready" (TK) entre rondas
-      this._onceAnim(FRAMES.ready, 500, () => {
-        this.startExchange();
-      });
+      if (this.data.gameEnded || this.data.isPaused || this.data.isCountingDown || this.data.showTutorialModal) return;
+      this.startExchange();
     }, delay);
   },
 
   endGame(playerWon) {
     if (this.data.gameEnded) return;
-  
+
     this.clearRoundTimers();
     this.clearGlobalTimer();
-  
+
     this.setData({
       gameEnded: true,
       canChoose: false,
       inputLocked: true,
       roundToken: this.data.roundToken + 1
     });
+
+    this.stopTokatAnimation();
 
     const isWin = this.game.isMaxProgress() || playerWon;
 
@@ -524,7 +601,7 @@ Page({
       tokensEarned: isWin ? 5 : 1,
       currentScore: this.game.state.progress
     });
-  
+
     my.redirectTo({
       url: `/pages/tokaRPS/pages/end/end?playerWon=${isWin ? 1 : 0}&progress=${this.data.progress}&maxProgress=${this.data.maxProgress}`
     });
@@ -532,7 +609,7 @@ Page({
 
   clearRoundTimers() {
     if (this.wordTimers && this.wordTimers.length) {
-      this.wordTimers.forEach(timer => clearTimeout(timer));
+      this.wordTimers.forEach((timer) => clearTimeout(timer));
     }
     this.wordTimers = [];
 
@@ -550,19 +627,21 @@ Page({
   cleanupScene() {
     this.clearRoundTimers();
     this.clearGlobalTimer();
-    this._stopAnim();
-    if (this.countdownInterval) clearInterval(this.countdownInterval);
+    this.stopTokatAnimation();
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
+      this.countdownInterval = null;
+    }
   },
 
   togglePause() {
-    if (this.data.gameEnded || this.data.isCountingDown) return;
+    if (this.data.gameEnded || this.data.isCountingDown || this.data.showTutorialModal) return;
 
     if (!this.data.isPaused) {
       this.clearRoundTimers();
       this.clearGlobalTimer();
-      this._stopAnim();
-      this._loopAnim(FRAMES.idle, 7);
-      this.setData({ isPaused: true });
+      this.setData({ isPaused: true, tokatStateText: 'Pausa' });
+      this.playTokatAnimation('idle');
     } else {
       this.startCountdown();
     }
@@ -572,25 +651,25 @@ Page({
     this.setData({
       isPaused: false,
       isCountingDown: true,
-      countdownText: "3"
+      countdownText: '3',
+      tokatStateText: 'Vuelve al ritmo'
     });
+
+    this.playTokatAnimation('idle');
 
     let count = 3;
     this.countdownInterval = setInterval(() => {
-      count--;
+      count -= 1;
       if (count > 0) {
         this.setData({ countdownText: count.toString() });
       } else if (count === 0) {
-        this.setData({ countdownText: "¡YA!" });
+        this.setData({ countdownText: '¡YA!' });
       } else {
         clearInterval(this.countdownInterval);
+        this.countdownInterval = null;
         this.setData({ isCountingDown: false });
-
-        // Animación "ready" antes de reanudar
-        this._onceAnim(FRAMES.ready, 500, () => {
-          this.startGlobalTimer();
-          this.startExchange();
-        });
+        this.startGlobalTimer();
+        this.startExchange();
       }
     }, 1000);
   },

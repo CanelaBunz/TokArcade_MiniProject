@@ -22,7 +22,6 @@ Page({
       '/images/tokat/frame0006.png'
     ];
 
-    // Loop tipo ida y vuelta para que no “salte” raro
     this.sequence = [0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1];
     this.framePointer = 0;
     this.spriteTimer = null;
@@ -51,16 +50,13 @@ Page({
       const frameIndex = this.sequence[this.framePointer];
       const nextFrame = this.frames[frameIndex];
 
-      this.setData({
-        tokatFrame: nextFrame
-      });
+      this.setData({ tokatFrame: nextFrame });
 
       this.framePointer += 1;
-
       if (this.framePointer >= this.sequence.length) {
         this.framePointer = 0;
       }
-    }, 140); // prueba entre 120 y 180
+    }, 140);
   },
 
   stopTokatAnimation() {

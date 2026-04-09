@@ -8,7 +8,7 @@
   />
 
   <view class="description">
-    Enfrenta a tus oponentes al ritmo de la música y llena tu barra de victoria antes de que se agoten los 50 segundos. Cada acierto te permitirá avanzar hacia la meta, mientras que los empates se acumularán para otorgarte un impulso adicional en este duelo de piedra, papel o tijera.
+    Entra al ritmo, espera el momento justo y vence a Tokat antes de que se acabe el tiempo.
   </view>
 
   <view class="play-button" onTap="startGame">

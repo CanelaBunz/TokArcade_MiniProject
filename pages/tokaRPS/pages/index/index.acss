@@ -20,7 +20,6 @@
   width: 360rpx;
   height: 360rpx;
   margin-top: 36rpx;
-  filter: drop-shadow(0 16rpx 32rpx rgba(116, 185, 255, 0.4));
 }
 
 .description {

@@ -1,6 +1,6 @@
 <view class="page">
   <view class="pause-button-top" onTap="togglePause">⏸</view>
-  
+
   <game-header 
     title="TOKA RPS"
     score="{{progress}}"
@@ -10,14 +10,14 @@
   />
 
   <view class="game-content">
+    <view class="helper-card">
+      <text class="helper-main" style="color: {{helperColor}};">{{helperText}}</text>
+      <text class="helper-sub">Ritmo actual: {{paceLabel}}</text>
+    </view>
 
-    <!-- Tokat character center stage -->
     <view class="tokat-stage">
-      <image
-        class="tokat-sprite"
-        src="{{tokatFrame}}"
-        mode="aspectFit"
-      />
+      <image class="tokat-sprite" src="{{tokatFrame}}" mode="aspectFit" />
+      <text class="tokat-state">{{tokatStateText}}</text>
     </view>
 
     <view class="rhythm-area">
@@ -34,7 +34,6 @@
       <text class="enemy-text">{{enemyChoiceText}}</text>
     </view>
 
-    <!-- Mano image buttons -->
     <view class="choices">
       <view
         class="choice-wrapper {{canChoose && !gameEnded ? 'choice-active' : 'choice-disabled'}}"
@@ -65,7 +64,6 @@
     </view>
   </view>
 
-  <!-- Pause Overlay -->
   <view a:if="{{isPaused}}" class="modal-overlay">
     <view class="modal-card">
       <text class="modal-title">JUEGO EN PAUSA</text>
@@ -74,9 +72,47 @@
     </view>
   </view>
 
-  <!-- Countdown Overlay -->
   <view a:if="{{isCountingDown}}" class="modal-overlay countdown-overlay">
     <text class="countdown-number">{{countdownText}}</text>
   </view>
 
+  <view a:if="{{showTutorialModal}}" class="modal-overlay tutorial-overlay">
+    <view class="tutorial-card">
+      <text class="tutorial-title">Cómo jugar</text>
+
+      <view class="tutorial-step">
+        <image class="tutorial-img" src="/images/Mano/ManoPiedra.png" mode="aspectFit" />
+        <view class="tutorial-copy">
+          <text class="tutorial-step-title">Sigue el ritmo</text>
+          <text class="tutorial-step-text">Observa la secuencia: PIEDRA, PAPEL, O...</text>
+        </view>
+      </view>
+
+      <view class="tutorial-step">
+        <image class="tutorial-img" src="/images/Mano/ManoTijeras.png" mode="aspectFit" />
+        <view class="tutorial-copy">
+          <text class="tutorial-step-title">Toca solo en ¡TIJERAS!</text>
+          <text class="tutorial-step-text">Antes de eso, los botones están desactivados.</text>
+        </view>
+      </view>
+
+      <view class="tutorial-step tutorial-step-last">
+        <image class="tutorial-img" src="/images/Mano/ManoPapel.png" mode="aspectFit" />
+        <view class="tutorial-copy">
+          <text class="tutorial-step-title">Avanza con victorias y empates</text>
+          <text class="tutorial-step-text">Ganar empuja mucho la barra. Con 4 empates seguidos también avanzas.</text>
+        </view>
+      </view>
+
+      <view class="tutorial-rhythm-strip">
+        <text class="rhythm-chip green-chip">PIEDRA</text>
+        <text class="rhythm-chip orange-chip">PAPEL</text>
+        <text class="rhythm-chip yellow-chip">O...</text>
+        <text class="rhythm-chip red-chip">¡TIJERAS!</text>
+      </view>
+
+      <text class="tutorial-note">Consejo: el juego empieza más calmado y luego acelera poco a poco. No te adelantes; espera el momento de ¡TIJERAS!</text>
+      <toka-button variant="primary" onClick="beginFromTutorial" fullWidth>Entendido</toka-button>
+    </view>
+  </view>
 </view>
